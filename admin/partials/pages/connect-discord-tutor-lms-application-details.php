@@ -78,7 +78,7 @@ $ets_tutor_lms_discord_redirect_page_id   = sanitize_text_field( trim( get_optio
 		<?php esc_html_e( 'Save Settings', 'connect-discord-tutor-lms' ); ?>
 	  </button>
 	  <?php if ( sanitize_text_field( get_option( 'ets_tutor_lms_discord_client_id' ) ) ) : ?>
-			<a href="?action=tutor-lms-discord-connect-to-bot" class="ets-btn tutor-lms-btn-connect-to-bot" id="tutor-lms-connect-discord-bot"><?php esc_html_e( 'Connect your Bot', 'connect-discord-tutor-lms' ) . Connect_tutor_lms_Discord_Addon::get_discord_logo_white(); ?> </a>
+			<a href="?action=tutor-lms-discord-connect-to-bot" class="ets-btn tutor-lms-btn-connect-to-bot" id="tutor-lms-connect-discord-bot"><?php esc_html_e( 'Connect your Bot', 'connect-discord-tutor-lms' ) . Connect_Discord_Tutor_Lms::get_discord_logo_white(); ?> </a>
 	  <?php endif; ?>
 	</p>
 </form>
