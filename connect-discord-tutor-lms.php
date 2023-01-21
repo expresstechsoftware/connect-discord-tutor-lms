@@ -36,6 +36,10 @@ if ( ! defined( 'WPINC' ) ) {
  * Rename this for your plugin and update it as you release new versions.
  */
 define( 'CONNECT_DISCORD_TUTOR_LMS_VERSION', '1.0.0' );
+define( 'CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH', plugin_dir_path( __FILE__ ) );
+define( 'CONNECT_DISCORD_TUTOR_LMS_API_URL', 'https://discord.com/api/v10/' );
+define( 'CONNECT_DISCORD_TUTOR_LMS_BOT_PERMISSIONS', 8 );
+define( 'CONNECT_DISCORD_TUTOR_LMS_OAUTH_SCOPES', 'identify email guilds guilds.join' );
 
 /**
  * The code that runs during plugin activation.
