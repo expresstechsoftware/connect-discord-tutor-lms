@@ -164,6 +164,7 @@ class Connect_Discord_Tutor_Lms {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'ets_tutor_discord_add_discord_menu', 99 );
 		$this->loader->add_action( 'wp_ajax_ets_tutor_lms_discord_update_redirect_url', $plugin_admin, 'ets_tutor_lms_discord_update_redirect_url' );
+		$this->loader->add_action( 'admin_post_tutor_lms_discord_application_settings', $plugin_admin, 'ets_tutor_lms_discord_application_settings' );
 
 	}
 
@@ -181,6 +182,20 @@ class Connect_Discord_Tutor_Lms {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
+	}
+
+	/**
+	 * Discord Logo
+	 *
+	 * @since    1.0.0
+	 * @access   public
+	 * @return STRING
+	 */
+	public static function get_discord_logo_white() {
+		$img  = file_get_contents( plugin_dir_path( dirname( __FILE__ ) ) . 'public/images/discord-logo-white.svg' );
+		$data = base64_encode( $img );
+
+		return '<img class="ets-discord-logo-white" src="data:image/svg+xml;base64,' . $data . '" />';
 	}
 
 	/**
