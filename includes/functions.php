@@ -98,3 +98,58 @@ function ets_tutor_lms_discord_update_bot_name_option() {
 	}
 
 }
+
+/**
+ * To check settings values saved or not
+ *
+ * @param NONE
+ * @return BOOL $status
+ */
+function ets_tutor_lms_discord_check_saved_settings_status() {
+	$ets_tutor_lms_discord_client_id     = get_option( 'ets_tutor_lms_discord_client_id' );
+	$ets_tutor_lms_discord_client_secret = get_option( 'ets_tutor_lms_discord_client_secret' );
+	$ets_tutor_lms_discord_bot_token     = get_option( 'ets_tutor_lms_discord_bot_token' );
+	$ets_tutor_lms_discord_redirect_url  = get_option( 'ets_tutor_lms_discord_redirect_url' );
+	$ets_tutor_lms_discord_server_id     = get_option( 'ets_tutor_lms_discord_server_id' );
+
+	if ( $ets_tutor_lms_discord_client_id && $ets_tutor_lms_discord_client_secret && $ets_tutor_lms_discord_bot_token && $ets_tutor_lms_discord_redirect_url && $ets_tutor_lms_discord_server_id ) {
+			$status = true;
+	} else {
+			 $status = false;
+	}
+
+		 return $status;
+}
+
+/**
+ * Add API error logs into log file
+ *
+ * @param ARRAY  $response_arr
+ * @param INT    $user_id
+ * @param ARRAY  $backtrace_arr
+ * @param string $error_type
+ *
+ * @return None
+ */
+function ets_tutor_lms_write_api_response_logs( $response_arr, $user_id, $backtrace_arr = array() ) {
+	$error        = current_time( 'mysql' );
+	$user_details = '';
+	if ( $user_id ) {
+		$user_details = '::User Id:' . $user_id;
+	}
+	$log_api_response = get_option( 'ets_tutor_lms_discord_log_api_response' );
+	$uuid             = get_option( 'ets_tutor_lms_discord_uuid_file_name' );
+	$log_file_name    = $uuid . Connect_Discord_Tutor_Lms_Admin::$log_file_name;
+
+	if ( is_array( $response_arr ) && array_key_exists( 'code', $response_arr ) ) {
+		$error .= '==>File:' . $backtrace_arr['file'] . $user_details . '::Line:' . $backtrace_arr['line'] . '::Function:' . $backtrace_arr['function'] . '::' . $response_arr['code'] . ':' . $response_arr['message'];
+		file_put_contents( WP_CONTENT_DIR . '/' . $log_file_name, $error . PHP_EOL, FILE_APPEND | LOCK_EX );
+	} elseif ( is_array( $response_arr ) && array_key_exists( 'error', $response_arr ) ) {
+		$error .= '==>File:' . $backtrace_arr['file'] . $user_details . '::Line:' . $backtrace_arr['line'] . '::Function:' . $backtrace_arr['function'] . '::' . $response_arr['error'];
+		file_put_contents( WP_CONTENT_DIR . '/' . $log_file_name, $error . PHP_EOL, FILE_APPEND | LOCK_EX );
+	} elseif ( $log_api_response == true ) {
+		$error .= json_encode( $response_arr ) . '::' . $user_id;
+		file_put_contents( WP_CONTENT_DIR . '/' . $log_file_name, $error . PHP_EOL, FILE_APPEND | LOCK_EX );
+	}
+
+}

@@ -41,6 +41,14 @@ class Connect_Discord_Tutor_Lms_Admin {
 	private $version;
 
 	/**
+	 * Static property to define log file name
+	 *
+	 * @param None
+	 * @return string $log_file_name
+	 */
+	public static $log_file_name = 'tutor_lms_discord_api_logs.txt';
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
@@ -137,6 +145,8 @@ class Connect_Discord_Tutor_Lms_Admin {
 		wp_enqueue_style( $this->plugin_name );
 		wp_enqueue_script( $this->plugin_name . '-select2' );
 		wp_enqueue_script( $this->plugin_name . '-tabs-js' );
+		wp_enqueue_script( 'jquery-ui-draggable' );
+		wp_enqueue_script( 'jquery-ui-droppable' );
 		wp_enqueue_script( $this->plugin_name );
 
 		require_once CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH . 'admin/partials/connect-discord-tutor-lms-admin-display.php';
@@ -235,6 +245,143 @@ class Connect_Discord_Tutor_Lms_Admin {
 				$message = esc_html__( 'Your settings are saved successfully.', 'connect-discord-tutor-lms' );
 
 				$pre_location = $ets_current_url . '&save_settings_msg=' . $message . '#ets_tutor_lms_application_details';
+				wp_safe_redirect( $pre_location );
+			}
+		}
+	}
+
+	/**
+	 *
+	 * GET OBJECT REST API response
+	 */
+	public function ets_tutor_lms_load_discord_roles() {
+		if ( ! current_user_can( 'administrator' ) ) {
+			wp_send_json_error( 'You do not have sufficient rights', 403 );
+			exit();
+		}
+		// Check for nonce security.
+		if ( ! wp_verify_nonce( $_POST['ets_tutor_lms_discord_nonce'], 'ets-tutor-lms-discord-ajax-nonce' ) ) {
+			wp_send_json_error( 'You do not have sufficient rights', 403 );
+			exit();
+		}
+		$user_id           = get_current_user_id();
+		$server_id         = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_server_id' ) ) );
+		$discord_bot_token = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_bot_token' ) ) );
+
+		if ( $server_id && $discord_bot_token ) {
+			$discod_server_roles_api = CONNECT_DISCORD_TUTOR_LMS_API_URL . 'guilds/' . $server_id . '/roles';
+			$guild_args              = array(
+				'method'  => 'GET',
+				'headers' => array(
+					'Content-Type'  => 'application/json',
+					'Authorization' => 'Bot ' . $discord_bot_token,
+				),
+			);
+
+			$guild_response = wp_remote_post( $discod_server_roles_api, $guild_args );
+			$response_arr   = json_decode( wp_remote_retrieve_body( $guild_response ), true );
+
+			if ( is_array( $response_arr ) && ! empty( $response_arr ) ) {
+				if ( array_key_exists( 'code', $response_arr ) || array_key_exists( 'error', $response_arr ) ) {
+					ets_tutor_lms_write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+				} else {
+					$response_arr['previous_mapping'] = sanitize_text_field( get_option( 'ets_tutor_lms_discord_role_mapping' ) );
+
+					$discord_roles = array();
+					foreach ( $response_arr as $key => $value ) {
+						$isbot = false;
+						if ( is_array( $value ) ) {
+							if ( array_key_exists( 'tags', $value ) ) {
+								if ( array_key_exists( 'bot_id', $value['tags'] ) ) {
+									$isbot = true;
+								}
+							}
+						}
+						if ( 'previous_mapping' !== $key && false === $isbot && isset( $value['name'] ) && $value['name'] != '@everyone' ) {
+							$discord_roles[ $value['id'] ]       = $value['name'];
+							$discord_roles_color[ $value['id'] ] = $value['color'];
+						}
+					}
+					update_option( 'ets_tutor_lms_discord_all_roles', serialize( $discord_roles ) );
+					update_option( 'ets_tutor_lms_discord_roles_color', serialize( $discord_roles_color ) );
+				}
+			}
+
+			return wp_send_json( $response_arr );
+		}
+	}
+
+	/*
+	Catch the Connect to Bot action from admin.
+	*/
+	public function ets_tutor_lms_discord_action_connect_bot() {
+
+		if ( isset( $_GET['action'] ) && $_GET['action'] == 'tutor-lms-discord-connect-to-bot' ) {
+			if ( ! current_user_can( 'administrator' ) ) {
+				wp_send_json_error( 'You do not have sufficient rights', 403 );
+				exit();
+			}
+
+			$discord_authorise_api_url = CONNECT_DISCORD_TUTOR_LMS_API_URL . 'oauth2/authorize';
+			$params                    = array(
+				'client_id'            => sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_client_id' ) ) ),
+				'permissions'          => CONNECT_DISCORD_TUTOR_LMS_BOT_PERMISSIONS,
+				'scope'                => 'bot',
+				'guild_id'             => sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_server_id' ) ) ),
+				'disable_guild_select' => 'true',
+				'redirect_uri'         => sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_admin_redirect_url' ) ) ),
+				'response_type'        => 'code',
+			);
+
+			$discord_authorise_api_url = CONNECT_DISCORD_TUTOR_LMS_API_URL . 'oauth2/authorize?' . http_build_query( $params );
+			wp_redirect( $discord_authorise_api_url, 302, get_site_url() );
+			exit;
+		}
+	}
+
+	/**
+	 * Save Discord Roles Courses mapping.
+	 */
+	public function ets_tutor_lms_discord_role_mapping() {
+		if ( ! current_user_can( 'administrator' ) ) {
+			wp_send_json_error( 'You do not have sufficient rights', 403 );
+			exit();
+		}
+		$ets_discord_roles = isset( $_POST['ets_tutor_lms_discord_role_mapping'] ) ? sanitize_textarea_field( trim( $_POST['ets_tutor_lms_discord_role_mapping'] ) ) : '';
+
+		$ets_tutor_lms_discord_default_role_id = isset( $_POST['defaultRole'] ) ? sanitize_textarea_field( trim( $_POST['defaultRole'] ) ) : '';
+
+		$allow_none_member = isset( $_POST['allow_none_member'] ) ? sanitize_textarea_field( trim( $_POST['allow_none_member'] ) ) : '';
+
+		$ets_discord_roles = stripslashes( $ets_discord_roles );
+
+		$current_url_role    = isset( $_POST['current_url_role'] ) ? sanitize_text_field( trim( $_POST['current_url_role'] ) ) : '';
+		$save_mapping_status = update_option( 'ets_tutor_lms_discord_role_mapping', $ets_discord_roles );
+
+		if ( isset( $_POST['ets_tutor_lms_discord_role_mappings_nonce'] ) && wp_verify_nonce( $_POST['ets_tutor_lms_discord_role_mappings_nonce'], 'discord_role_mappings_nonce' ) ) {
+
+			if ( ( $save_mapping_status || isset( $_POST['ets_tutor_lms_discord_role_mapping'] ) ) && ! isset( $_POST['flush'] ) ) {
+
+				if ( $ets_tutor_lms_discord_default_role_id ) {
+					update_option( 'ets_tutor_lms_discord_default_role_id', $ets_tutor_lms_discord_default_role_id );
+				}
+
+				if ( $allow_none_member ) {
+					update_option( 'ets_tutor_lms_discord_allow_none_member', $allow_none_member );
+				}
+
+				$message = esc_html__( 'Your mappings are saved successfully.', 'connect-discord-tutor-lms' );
+				if ( isset( $current_url_role ) ) {
+					$pre_location = $current_url_role . '&save_settings_msg=' . $message . '#ets_tutor_lms_role_level';
+					wp_safe_redirect( $pre_location );
+				}
+			}
+			if ( isset( $_POST['flush'] ) ) {
+				delete_option( 'ets_tutor_lms_discord_role_mapping' );
+				delete_option( 'ets_tutor_lms_discord_default_role_id' );
+				$message = esc_html__( 'Your settings are flushed successfully.', 'connect-discord-tutor-lms' );
+
+				$pre_location = $current_url_role . '&save_settings_msg=' . $message . '#ets_tutor_lms_role_level';
 				wp_safe_redirect( $pre_location );
 			}
 		}
