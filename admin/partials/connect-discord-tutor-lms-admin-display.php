@@ -31,7 +31,11 @@ if ( isset( $_GET['save_settings_msg'] ) ) {
 					<?php if ( ets_tutor_lms_discord_check_saved_settings_status() ) : ?>
 						<button class="skltbs-tab" data-identity="level-mapping" ><?php esc_html_e( 'Role Mapping', 'connect-discord-tutor-lms' ); ?></button>
 					<?php endif; ?>
-				</li>							                            
+				</li>
+				<li class="skltbs-tab-item">
+				<button class="skltbs-tab" data-identity="advanced" ><?php esc_html_e( 'Advanced', 'connect-discord-tutor-lms' ); ?>	
+				</button>
+				</li>											                            
 			</ul>
 			<div class="skltbs-panel-group">
 				<div id="ets_tutor_lms_application_details" class="tutor-lms-discord-tab-conetent skltbs-panel">
@@ -41,7 +45,10 @@ if ( isset( $_GET['save_settings_msg'] ) ) {
 				<div id='ets_tutor_lms_role_level' class="skltbs-panel">
 					<?php require_once CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH . 'admin/partials/pages/connect-discord-tutor-lms-roles-mapping.php'; ?>
 				</div>
-				<?php endif; ?>															
+				<?php endif; ?>	
+				<div id='ets_tutor_lms_discord_advanced' class="skltbs-panel">
+				<?php require_once CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH . 'admin/partials/pages/connect-discord-tutor-lms-advanced.php'; ?>
+				</div>																		
 			</div>  
 		</div>
 
