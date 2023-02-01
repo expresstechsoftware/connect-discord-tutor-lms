@@ -387,4 +387,96 @@ class Connect_Discord_Tutor_Lms_Admin {
 		}
 	}
 
+	/**
+	 * Save Advance settings.
+	 */
+	public function ets_tutor_lms_discord_advance_settings() {
+		if ( ! current_user_can( 'administrator' ) || ! wp_verify_nonce( $_POST['ets_tutor_lms_discord_save_advance_settings'], 'save_tutor_lms_discord_general_advance_settings' ) ) {
+			wp_send_json_error( 'You do not have sufficient rights', 403 );
+			exit();
+		}
+
+		$ets_tutor_lms_discord_welcome_message         = isset( $_POST['ets_tutor_lms_discord_welcome_message'] ) ? sanitize_textarea_field( trim( $_POST['ets_tutor_lms_discord_welcome_message'] ) ) : '';
+		$ets_tutor_lms_discord_course_complete_message = isset( $_POST['ets_tutor_lms_discord_course_complete_message'] ) ? sanitize_textarea_field( trim( $_POST['ets_tutor_lms_discord_course_complete_message'] ) ) : '';
+
+		$retry_api_count      = isset( $_POST['ets_tutor_lms_retry_api_count'] ) ? sanitize_textarea_field( trim( $_POST['ets_tutor_lms_retry_api_count'] ) ) : '';
+		$set_job_cnrc         = isset( $_POST['set_job_cnrc'] ) ? sanitize_textarea_field( trim( $_POST['set_job_cnrc'] ) ) : '';
+		$set_job_q_batch_size = isset( $_POST['set_job_q_batch_size'] ) ? sanitize_textarea_field( trim( $_POST['set_job_q_batch_size'] ) ) : '';
+		$ets_current_url      = sanitize_text_field( trim( $_POST['current_url'] ) );
+
+		if ( isset( $_POST['ets_tutor_lms_discord_save_advance_settings'] ) && wp_verify_nonce( $_POST['ets_tutor_lms_discord_save_advance_settings'], 'save_tutor_lms_discord_general_advance_settings' ) ) {
+			if ( isset( $_POST['adv_submit'] ) ) {
+
+				if ( isset( $_POST['ets_tutor_lms_discord_send_welcome_dm'] ) ) {
+					update_option( 'ets_tutor_lms_discord_send_welcome_dm', true );
+				} else {
+					update_option( 'ets_tutor_lms_discord_send_welcome_dm', false );
+				}
+				if ( isset( $_POST['ets_tutor_lms_discord_welcome_message'] ) && $_POST['ets_tutor_lms_discord_welcome_message'] != '' ) {
+					update_option( 'ets_tutor_lms_discord_welcome_message', $ets_tutor_lms_discord_welcome_message );
+				} else {
+					update_option( 'ets_tutor_lms_discord_welcome_message', '' );
+				}
+				if ( isset( $_POST['ets_tutor_lms_discord_send_course_complete_dm'] ) ) {
+					update_option( 'ets_tutor_lms_discord_send_course_complete_dm', true );
+				} else {
+					update_option( 'ets_tutor_lms_discord_send_course_complete_dm', false );
+				}
+				if ( isset( $_POST['ets_tutor_lms_discord_course_complete_message'] ) && $_POST['ets_tutor_lms_discord_course_complete_message'] != '' ) {
+					update_option( 'ets_tutor_lms_discord_course_complete_message', $ets_tutor_lms_discord_course_complete_message );
+				} else {
+					update_option( 'ets_tutor_lms_discord_course_complete_message', '' );
+				}
+
+				if ( isset( $_POST['retry_failed_api'] ) ) {
+					update_option( 'ets_tutor_lms_discord_retry_failed_api', true );
+				} else {
+					update_option( 'ets_tutor_lms_discord_retry_failed_api', false );
+				}
+				if ( isset( $_POST['kick_upon_disconnect'] ) ) {
+					update_option( 'ets_tutor_lms_discord_kick_upon_disconnect', true );
+				} else {
+					update_option( 'ets_tutor_lms_discord_kick_upon_disconnect', false );
+				}
+				if ( isset( $_POST['ets_tutor_lms_retry_api_count'] ) ) {
+					if ( $retry_api_count < 1 ) {
+						update_option( 'ets_tutor_lms_discord_retry_api_count', 1 );
+					} else {
+						update_option( 'ets_tutor_lms_discord_retry_api_count', $retry_api_count );
+					}
+				}
+				if ( isset( $_POST['set_job_cnrc'] ) ) {
+					if ( $set_job_cnrc < 1 ) {
+						update_option( 'ets_tutor_lms_discord_job_queue_concurrency', 1 );
+					} else {
+						update_option( 'ets_tutor_lms_discord_job_queue_concurrency', $set_job_cnrc );
+					}
+				}
+				if ( isset( $_POST['set_job_q_batch_size'] ) ) {
+					if ( $set_job_q_batch_size < 1 ) {
+						update_option( 'ets_tutor_lms_discord_job_queue_batch_size', 1 );
+					} else {
+						update_option( 'ets_tutor_lms_discord_job_queue_batch_size', $set_job_q_batch_size );
+					}
+				}
+				if ( isset( $_POST['log_api_res'] ) ) {
+					update_option( 'ets_tutor_lms_discord_log_api_response', true );
+				} else {
+					update_option( 'ets_tutor_lms_discord_log_api_response', false );
+				}
+				if ( isset( $_POST['embed_messaging_feature'] ) ) {
+					update_option( 'ets_tutor_lms_discord_embed_messaging_feature', true );
+				} else {
+					update_option( 'ets_tutor_lms_discord_embed_messaging_feature', false );
+				}
+
+				$message      = esc_html__( 'Your settings are saved successfully.', 'connect-discord-tutor-lms' );
+				$pre_location = $ets_current_url . '&save_settings_msg=' . $message . '#ets_tutor_lms_discord_advanced';
+				wp_safe_redirect( $pre_location );
+
+			}
+		}
+
+	}
+
 }
