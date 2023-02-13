@@ -144,7 +144,8 @@ class Connect_Discord_Tutor_Lms_Public {
 			}
 		}
 
-			$restrictcontent_discord = '';
+		$restrictcontent_discord = '';
+
 		if ( ets_tutor_lms_discord_check_saved_settings_status() ) {
 
 			if ( $access_token ) {
@@ -183,6 +184,16 @@ class Connect_Discord_Tutor_Lms_Public {
 
 		return wp_kses( $restrictcontent_discord, ets_tutor_lms_discord_allowed_html() );
 
+	}
+
+	/**
+	 * Undocumented function
+	 *
+	 * @return void
+	 */
+	public function ets_tutor_lms_display_discord_button() {
+
+		echo do_shortcode( '[tutor_lms_discord]' );
 	}
 
 }

@@ -174,50 +174,71 @@ function ets_tutor_lms_discord_get_student_courses_id( $user_id ) {
  */
 function ets_tutor_lms_discord_roles_assigned_message( $mapped_role_name, $default_role_name, $restrictcontent_discord ) {
 
+	if ( $mapped_role_name ) {
+		$restrictcontent_discord .= '<p class="ets_assigned_role">';
+
+		$restrictcontent_discord .= esc_html__( 'Following Roles will be assigned to you in Discord: ', 'connect-discord-tutor-lms' );
+		$restrictcontent_discord .= $mapped_role_name;
+		if ( $default_role_name ) {
+			$restrictcontent_discord .= $default_role_name;
+
+		}
+
+		$restrictcontent_discord .= '</p>';
+	} elseif ( $default_role_name ) {
+		$restrictcontent_discord .= '<p class="ets_assigned_role">';
+
+		$restrictcontent_discord .= esc_html__( 'Following Role will be assigned to you in Discord: ', 'connect-discord-tutor-lms' );
+		$restrictcontent_discord .= $default_role_name;
+
+		$restrictcontent_discord .= '</p>';
+
+	}
+	return $restrictcontent_discord;
 }
 
 /**
- * Get allowed html using Wordpress API function wp_kses
+ * Get allowed html using WordPress API function wp_kses
  *
  * @param STRING $html_message
  * @return STRING $html_message
  */
 
- function ets_tutor_lms_discord_allowed_html() {
+function ets_tutor_lms_discord_allowed_html() {
 	$allowed_html = array(
-		'div' => array(
-			'class' => array()
-		),
-		'p' => array(               
-			'class' => array()
-		),
-		'a' => array(                                
-			'id' => array(),
-			'data-user-id' => array(),                    
-			'href' => array(), 
+		'div'    => array(
 			'class' => array(),
-			'style' => array(),                    
 		),
-		'label' => array(
-			'class'=>array() 
+		'p'      => array(
+			'class' => array(),
 		),
-		'h3' => array(),            
-		'span' => array(
-			'class' => array()
+		'a'      => array(
+			'id'           => array(),
+			'data-user-id' => array(),
+			'href'         => array(),
+			'class'        => array(),
+			'style'        => array(),
 		),
-		'i' => array(
+		'label'  => array(
+			'class' => array(),
+		),
+		'h3'     => array(),
+		'span'   => array(
+			'class' => array(),
+		),
+		'i'      => array(
 			'style' => array(),
-			'class' => array()                    
+			'class' => array(),
 		),
 		'button' => array(
-			'class' => array(),
+			'class'        => array(),
 			'data-user-id' => array(),
-			'id' => array(),                    
+			'id'           => array(),
 		),
-		'img'  => array(
-			'src' => array(),
-			'class' => array()
-		),		            
+		'img'    => array(
+			'src'   => array(),
+			'class' => array(),
+		),
 	);
 
 	return $allowed_html;
