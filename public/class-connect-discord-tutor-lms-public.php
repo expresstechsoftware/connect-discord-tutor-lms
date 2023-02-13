@@ -196,4 +196,16 @@ class Connect_Discord_Tutor_Lms_Public {
 		echo do_shortcode( '[tutor_lms_discord]' );
 	}
 
+	/**
+	 * Allow data protocol.
+	 *
+	 * @since    1.0.0
+	 * @return array
+	 */
+	public function ets_tutor_lms_discord_allow_data_protocol( $protocols ) {
+
+		$protocols[] = 'data';
+		return $protocols;
+	}
+
 }
