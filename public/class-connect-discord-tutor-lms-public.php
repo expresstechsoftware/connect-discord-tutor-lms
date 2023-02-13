@@ -122,7 +122,7 @@ class Connect_Discord_Tutor_Lms_Public {
 		$ets_tutor_lms_discord_role_mapping               = json_decode( get_option( 'ets_tutor_lms_discord_role_mapping' ), true );
 		$all_roles                                        = unserialize( get_option( 'ets_tutor_lms_discord_all_roles' ) );
 		$roles_color                                      = unserialize( get_option( 'ets_tutor_lms_discord_roles_color' ) );
-		$enrolled_courses                                 = ets_tutor_lms_discord_get_student_courses_id( $user_id );
+		$enrolled_courses                                 = tutor_utils()->get_enrolled_courses_ids_by_user( $user_id );
 		$mapped_role_name                                 = '';
 		if ( is_array( $enrolled_courses ) && is_array( $all_roles ) && is_array( $ets_tutor_lms_discord_role_mapping ) ) {
 			foreach ( $enrolled_courses as $key => $enrolled_course_id ) {
@@ -199,6 +199,7 @@ class Connect_Discord_Tutor_Lms_Public {
 	/**
 	 * Allow data protocol.
 	 *
+	 * @param array $protocols
 	 * @since    1.0.0
 	 * @return array
 	 */
