@@ -153,3 +153,72 @@ function ets_tutor_lms_write_api_response_logs( $response_arr, $user_id, $backtr
 	}
 
 }
+
+/**
+ * Undocumented function
+ *
+ * @param INT $user_id
+ * @return void
+ */
+function ets_tutor_lms_discord_get_student_courses_id( $user_id ) {
+
+}
+
+/**
+ * Undocumented function
+ *
+ * @param [type] $mapped_role_name
+ * @param [type] $default_role_name
+ * @param [type] $restrictcontent_discord
+ * @return void
+ */
+function ets_tutor_lms_discord_roles_assigned_message( $mapped_role_name, $default_role_name, $restrictcontent_discord ) {
+
+}
+
+/**
+ * Get allowed html using Wordpress API function wp_kses
+ *
+ * @param STRING $html_message
+ * @return STRING $html_message
+ */
+
+ function ets_tutor_lms_discord_allowed_html() {
+	$allowed_html = array(
+		'div' => array(
+			'class' => array()
+		),
+		'p' => array(               
+			'class' => array()
+		),
+		'a' => array(                                
+			'id' => array(),
+			'data-user-id' => array(),                    
+			'href' => array(), 
+			'class' => array(),
+			'style' => array(),                    
+		),
+		'label' => array(
+			'class'=>array() 
+		),
+		'h3' => array(),            
+		'span' => array(
+			'class' => array()
+		),
+		'i' => array(
+			'style' => array(),
+			'class' => array()                    
+		),
+		'button' => array(
+			'class' => array(),
+			'data-user-id' => array(),
+			'id' => array(),                    
+		),
+		'img'  => array(
+			'src' => array(),
+			'class' => array()
+		),		            
+	);
+
+	return $allowed_html;
+}

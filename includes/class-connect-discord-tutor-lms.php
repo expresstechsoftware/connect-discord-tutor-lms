@@ -185,6 +185,7 @@ class Connect_Discord_Tutor_Lms {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_shortcode( 'tutor_lms_discord', $plugin_public, 'ets_tutor_lms_add_discord_button' );
 
 	}
 
