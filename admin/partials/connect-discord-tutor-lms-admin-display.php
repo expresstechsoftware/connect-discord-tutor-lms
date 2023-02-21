@@ -35,6 +35,9 @@ if ( isset( $_GET['save_settings_msg'] ) ) {
 				<li class="skltbs-tab-item">
 				<button class="skltbs-tab" data-identity="advanced" ><?php esc_html_e( 'Advanced', 'connect-discord-tutor-lms' ); ?>	
 				</button>
+				<li class="skltbs-tab-item">
+				<button class="skltbs-tab" data-identity="appearance" ><?php esc_html_e( 'Appearance', 'connect-discord-tutor-lms' ); ?>	
+				</button>				
 				</li>											                            
 			</ul>
 			<div class="skltbs-panel-group">
@@ -48,7 +51,10 @@ if ( isset( $_GET['save_settings_msg'] ) ) {
 				<?php endif; ?>	
 				<div id='ets_tutor_lms_discord_advanced' class="skltbs-panel">
 				<?php require_once CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH . 'admin/partials/pages/connect-discord-tutor-lms-advanced.php'; ?>
-				</div>																		
+				</div>	
+				<div id='ets_tutor_lms_discord_appearance' class="tutor-lms-discord-tab-conetent skltbs-panel">
+				<?php require_once CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH . 'admin/partials/pages/connect-discord-tutor-lms-appearance.php'; ?>
+				</div>																					
 			</div>  
 		</div>
 
