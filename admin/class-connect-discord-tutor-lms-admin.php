@@ -142,11 +142,13 @@ class Connect_Discord_Tutor_Lms_Admin {
 
 		wp_enqueue_style( $this->plugin_name . '-select2' );
 		wp_enqueue_style( $this->plugin_name . 'discord_tabs_css' );
+		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_style( $this->plugin_name );
 		wp_enqueue_script( $this->plugin_name . '-select2' );
 		wp_enqueue_script( $this->plugin_name . '-tabs-js' );
 		wp_enqueue_script( 'jquery-ui-draggable' );
 		wp_enqueue_script( 'jquery-ui-droppable' );
+		wp_enqueue_script( 'wp-color-picker' );
 		wp_enqueue_script( $this->plugin_name );
 
 		require_once CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH . 'admin/partials/connect-discord-tutor-lms-admin-display.php';
