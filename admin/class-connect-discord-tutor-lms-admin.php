@@ -367,7 +367,7 @@ class Connect_Discord_Tutor_Lms_Admin {
 				}
 
 				if ( $allow_none_member ) {
-					update_option( 'ets_tutor_lms_discord_allow_none_member', $allow_none_member );
+					update_option( 'ets_tutor_lms_discord_allow_none_student', $allow_none_member );
 				}
 
 				$message = esc_html__( 'Your mappings are saved successfully.', 'connect-discord-tutor-lms' );

@@ -185,6 +185,11 @@ class Connect_Discord_Tutor_Lms {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_shortcode( 'tutor_lms_discord', $plugin_public, 'ets_tutor_lms_add_discord_button' );
+		$this->loader->add_filter( 'kses_allowed_protocols', $plugin_public, 'ets_tutor_lms_discord_allow_data_protocol' );
+		/** If load from page dashboard */
+		$this->loader->add_action( 'tutor_load_dashboard_template_before', $plugin_public, 'ets_tutor_lms_display_discord_button' );
+		$this->loader->add_action( 'tutor_dashboard/before_header_button', $plugin_public, 'ets_tutor_lms_display_discord_button' );
 
 	}
 

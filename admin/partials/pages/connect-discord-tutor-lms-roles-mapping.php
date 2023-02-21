@@ -14,7 +14,7 @@ $get_courses_tutorlms = get_posts(
 );
 
 $default_role      = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_default_role_id' ) ) );
-$allow_none_member = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_allow_none_member' ) ) );
+$allow_none_member = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_allow_none_student' ) ) );
 
 ?>
  <!-- Drag and Drop the Discord Roles  -->
