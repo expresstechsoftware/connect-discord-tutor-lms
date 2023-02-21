@@ -266,7 +266,9 @@
 			localStorage.removeItem('tutorlmsMapArray');
 			localStorage.removeItem('TutorlmsMappingjson');
 			window.location.href = window.location.href;
-		}); 	
+		});
+		$('#ets_tutor_lms_discord_connect_button_bg_color').wpColorPicker();
+		$('#ets_tutor_lms_discord_disconnect_button_bg_color').wpColorPicker();
 			
 		}); // DOM ready 
 

@@ -149,26 +149,26 @@ class Connect_Discord_Tutor_Lms_Public {
 		if ( ets_tutor_lms_discord_check_saved_settings_status() ) {
 
 			if ( $access_token ) {
-				$disconnect_btn_bg_color  = 'style="background-color:' . $ets_tutor_lms_discord_disconnect_button_bg_color . '"';
-				$restrictcontent_discord .= '<div>';
-				$restrictcontent_discord .= '<div>';
-				$restrictcontent_discord .= '<label class="ets-connection-lbl">' . esc_html__( 'Discord connection', 'connect-discord-tutor-lms' ) . '</label>';
-				$restrictcontent_discord .= '</div>';
-				$restrictcontent_discord .= '<div>';
-				$restrictcontent_discord .= '<a href="#" class="ets-btn tutor-lms-discord-btn-disconnect" ' . $disconnect_btn_bg_color . ' id="tutor-lms-discord-disconnect-discord" data-user-id="' . esc_attr( $user_id ) . '">' . esc_html( $ets_tutor_lms_discord_disconnect_button_text ) . Connect_Discord_Tutor_Lms::get_discord_logo_white() . '</a>';
-				$restrictcontent_discord .= '<span class="ets-spinner"></span>';
-				$restrictcontent_discord .= '<p>' . esc_html__( sprintf( 'Connected account: %s', $_ets_tutor_lms_discord_username ), 'connect-discord-tutor-lms' ) . '</p>';
-				$restrictcontent_discord  = ets_tutor_lms_discord_get_user_avatar( $_ets_tutor_lms_discord_user_id, $discord_user_avatar, $restrictcontent_discord );
-				$restrictcontent_discord  = ets_tutor_lms_discord_roles_assigned_message( $mapped_role_name, $default_role_name, $restrictcontent_discord );
-				$restrictcontent_discord .= '</div>';
-				$restrictcontent_discord .= '</div>';
+				$ets_tutor_lms_discord_connect_button_bg_color = 'style="background-color:' . $ets_tutor_lms_discord_disconnect_button_bg_color . '"';
+				$restrictcontent_discord                      .= '<div class="ets-tutor-lms-discord-button-wrapper">';
+				$restrictcontent_discord                      .= '<div>';
+				$restrictcontent_discord                      .= '<label class="ets-connection-lbl">' . esc_html__( 'Discord connection', 'connect-discord-tutor-lms' ) . '</label>';
+				$restrictcontent_discord                      .= '</div>';
+				$restrictcontent_discord                      .= '<div>';
+				$restrictcontent_discord                      .= '<a href="#" class="ets-btn tutor-lms-discord-btn-disconnect" ' . $ets_tutor_lms_discord_connect_button_bg_color . ' id="tutor-lms-discord-disconnect-discord" data-user-id="' . esc_attr( $user_id ) . '">' . esc_html( $ets_tutor_lms_discord_disconnect_button_text ) . Connect_Discord_Tutor_Lms::get_discord_logo_white() . '</a>';
+				$restrictcontent_discord                      .= '<span class="ets-spinner"></span>';
+				$restrictcontent_discord                      .= '<p>' . esc_html__( sprintf( 'Connected account: %s', $_ets_tutor_lms_discord_username ), 'connect-discord-tutor-lms' ) . '</p>';
+				$restrictcontent_discord                       = ets_tutor_lms_discord_get_user_avatar( $_ets_tutor_lms_discord_user_id, $discord_user_avatar, $restrictcontent_discord );
+				$restrictcontent_discord                       = ets_tutor_lms_discord_roles_assigned_message( $mapped_role_name, $default_role_name, $restrictcontent_discord );
+				$restrictcontent_discord                      .= '</div>';
+				$restrictcontent_discord                      .= '</div>';
 
 			} elseif ( ( ets_tutor_lms_discord_get_student_courses_id( $user_id ) && $mapped_role_name )
 								|| ( ets_tutor_lms_discord_get_student_courses_id( $user_id ) && ! $mapped_role_name && $default_role_name )
 								|| ( $allow_none_student == 'yes' ) ) {
 
 				$connect_btn_bg_color     = 'style="background-color:' . $ets_tutor_lms_discord_connect_button_bg_color . '"';
-				$restrictcontent_discord .= '<div>';
+				$restrictcontent_discord .= '<div class="ets-tutor-lms-discord-button-wrapper">';
 				$restrictcontent_discord .= '<h3>' . esc_html__( 'Discord connection', 'connect-discord-tutor-lms' ) . '</h3>';
 				$restrictcontent_discord .= '<div>';
 				$restrictcontent_discord .= '<a href="?action=tutor-lms-discord-login" class="tutor-lms-discord-btn-connect ets-btn" ' . $connect_btn_bg_color . ' >' . esc_html( $ets_tutor_lms_discord_loggedin_button_text ) . Connect_Discord_Tutor_Lms::get_discord_logo_white() . '</a>';

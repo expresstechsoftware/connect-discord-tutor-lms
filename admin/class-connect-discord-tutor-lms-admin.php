@@ -142,11 +142,13 @@ class Connect_Discord_Tutor_Lms_Admin {
 
 		wp_enqueue_style( $this->plugin_name . '-select2' );
 		wp_enqueue_style( $this->plugin_name . 'discord_tabs_css' );
+		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_style( $this->plugin_name );
 		wp_enqueue_script( $this->plugin_name . '-select2' );
 		wp_enqueue_script( $this->plugin_name . '-tabs-js' );
 		wp_enqueue_script( 'jquery-ui-draggable' );
 		wp_enqueue_script( 'jquery-ui-droppable' );
+		wp_enqueue_script( 'wp-color-picker' );
 		wp_enqueue_script( $this->plugin_name );
 
 		require_once CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH . 'admin/partials/connect-discord-tutor-lms-admin-display.php';
@@ -474,6 +476,52 @@ class Connect_Discord_Tutor_Lms_Admin {
 				$pre_location = $ets_current_url . '&save_settings_msg=' . $message . '#ets_tutor_lms_discord_advanced';
 				wp_safe_redirect( $pre_location );
 
+			}
+		}
+
+	}
+
+	/**
+	 * Save apearance settings
+	 *
+	 * @param NONE
+	 * @return NONE
+	 */
+	public function ets_tutor_lms_discord_save_appearance_settings() {
+		if ( ! current_user_can( 'administrator' ) ) {
+			wp_send_json_error( 'You do not have sufficient rights', 403 );
+			exit();
+		}
+
+		$ets_tutor_lms_discord_connect_button_bg_color    = isset( $_POST['ets_tutor_lms_discord_connect_button_bg_color'] ) && $_POST['ets_tutor_lms_discord_connect_button_bg_color'] !== '' ? sanitize_text_field( trim( $_POST['ets_tutor_lms_discord_connect_button_bg_color'] ) ) : '#77a02e';
+		$ets_tutor_lms_discord_disconnect_button_bg_color = isset( $_POST['ets_tutor_lms_discord_disconnect_button_bg_color'] ) && $_POST['ets_tutor_lms_discord_disconnect_button_bg_color'] != '' ? sanitize_text_field( trim( $_POST['ets_tutor_lms_discord_disconnect_button_bg_color'] ) ) : '#ff0000';
+		$ets_tutor_lms_loggedin_btn_text                  = isset( $_POST['ets_tutor_lms_loggedin_btn_text'] ) && $_POST['ets_tutor_lms_loggedin_btn_text'] != '' ? sanitize_text_field( trim( $_POST['ets_tutor_lms_loggedin_btn_text'] ) ) : 'Connect To Discord';
+		$ets_tutor_lms_loggedout_btn_text                 = isset( $_POST['ets_tutor_lms_loggedout_btn_text'] ) && $_POST['ets_tutor_lms_loggedout_btn_text'] != '' ? sanitize_text_field( trim( $_POST['ets_tutor_lms_loggedout_btn_text'] ) ) : 'Login With Discord';
+		$ets_tutor_lms_discord_disconnect_btn_text        = $_POST['ets_tutor_lms_discord_disconnect_btn_text'] ? sanitize_text_field( trim( $_POST['ets_tutor_lms_discord_disconnect_btn_text'] ) ) : 'Disconnect From Discord';
+
+		if ( isset( $_POST['appearance_submit'] ) ) {
+
+			if ( isset( $_POST['ets_tutor_lms_discord_save_appearance_settings'] ) && wp_verify_nonce( $_POST['ets_tutor_lms_discord_save_appearance_settings'], 'save_ets_tutor_lms_discord_appearance_settings' ) ) {
+				if ( $ets_tutor_lms_discord_connect_button_bg_color ) {
+					update_option( 'ets_tutor_lms_discord_connect_button_bg_color', $ets_tutor_lms_discord_connect_button_bg_color );
+				}
+				if ( $ets_tutor_lms_discord_disconnect_button_bg_color ) {
+					update_option( 'ets_tutor_lms_discord_disconnect_button_bg_color', $ets_tutor_lms_discord_disconnect_button_bg_color );
+				}
+				if ( $ets_tutor_lms_loggedout_btn_text ) {
+					update_option( 'ets_tutor_lms_discord_non_login_button_text', $ets_tutor_lms_loggedout_btn_text );
+				}
+				if ( $ets_tutor_lms_loggedin_btn_text ) {
+					update_option( 'ets_tutor_lms_discord_loggedin_button_text', $ets_tutor_lms_loggedin_btn_text );
+				}
+				if ( $ets_tutor_lms_discord_disconnect_btn_text ) {
+					update_option( 'ets_tutor_lms_discord_disconnect_button_text', $ets_tutor_lms_discord_disconnect_btn_text );
+				}
+				$message = esc_html__( 'Your settings are saved successfully.', 'connect-discord-tutor-lms' );
+				if ( isset( $_POST['current_url'] ) ) {
+					$pre_location = sanitize_text_field( $_POST['current_url'] ) . '&save_settings_msg=' . $message . '#ets_tutor_lms_discord_appearance';
+					wp_safe_redirect( $pre_location );
+				}
 			}
 		}
 

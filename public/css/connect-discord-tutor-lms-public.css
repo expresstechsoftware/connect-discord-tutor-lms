@@ -73,3 +73,11 @@ img.ets_discord_user_avatar{
   display: inline-block;
   margin-left: 10px;
 }
+div.ets-tutor-lms-discord-button-wrapper{
+
+}
+div.ets-tutor-lms-discord-button-wrapper img.ets-discord-logo-white{
+  width: 20px;
+  display: inline-block;
+  margin-left: 5px;
+}

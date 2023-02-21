@@ -169,6 +169,7 @@ class Connect_Discord_Tutor_Lms {
 		$this->loader->add_action( 'wp_ajax_ets_tutor_lms_load_discord_roles', $plugin_admin, 'ets_tutor_lms_load_discord_roles' );
 		$this->loader->add_action( 'admin_post_tutor_lms_discord_role_mapping', $plugin_admin, 'ets_tutor_lms_discord_role_mapping' );
 		$this->loader->add_action( 'admin_post_tutor_lms_discord_advance_settings', $plugin_admin, 'ets_tutor_lms_discord_advance_settings' );
+		$this->loader->add_action( 'admin_post_tutor_lms_discord_save_appearance_settings', $plugin_admin, 'ets_tutor_lms_discord_save_appearance_settings' );
 
 	}
 
