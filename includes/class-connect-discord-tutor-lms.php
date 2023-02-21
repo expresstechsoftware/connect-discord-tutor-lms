@@ -197,6 +197,9 @@ class Connect_Discord_Tutor_Lms {
 		/** If load from page dashboard */
 		$this->loader->add_action( 'tutor_load_dashboard_template_before', $plugin_public, 'ets_tutor_lms_display_discord_button' );
 		$this->loader->add_action( 'tutor_dashboard/before_header_button', $plugin_public, 'ets_tutor_lms_display_discord_button' );
+		$this->loader->add_action( 'init', $plugin_public, 'ets_tutor_lms_discord_api_callback' );
+		$this->loader->add_action( 'ets_tutor_lms_discord_as_handle_add_member_to_guild', $plugin_public, 'ets_tutor_lms_discord_as_handler_add_member_to_guild', 10, 3 );
+		$this->loader->add_action( 'ets_tutor_lms_discord_as_schedule_member_put_role', $plugin_public, 'ets_tutor_lms_discord_as_handler_put_member_role', 10, 3 );
 
 	}
 

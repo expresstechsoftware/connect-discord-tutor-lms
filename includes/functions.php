@@ -155,13 +155,19 @@ function ets_tutor_lms_write_api_response_logs( $response_arr, $user_id, $backtr
 }
 
 /**
- * Undocumented function
+ * Get student's courses.
  *
  * @param INT $user_id
- * @return void
+ * @return ARRAY|NULL
  */
-function ets_tutor_lms_discord_get_student_courses_id( $user_id ) {
+function ets_tutor_lms_discord_get_student_courses_ids( $user_id ) {
+	$enrolled_courses = tutor_utils()->get_enrolled_courses_ids_by_user( $user_id );
+	if ( is_array( $enrolled_courses ) && count( $enrolled_courses ) > 0 ) {
 
+		return $enrolled_courses;
+	} else {
+		return null;
+	}
 }
 
 /**
@@ -325,4 +331,70 @@ function ets_tutor_lms_discord_get_all_pending_actions() {
 	} else {
 		return false;
 	}
+}
+
+/**
+ * Log API call response.
+ *
+ * @param INT          $user_id
+ * @param STRING       $api_url
+ * @param ARRAY        $api_args
+ * @param ARRAY|OBJECT $api_response
+ */
+function ets_tutor_lms_discord_log_api_response( $user_id, $api_url = '', $api_args = array(), $api_response = '' ) {
+	$log_api_response = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_log_api_response' ) ) );
+	if ( $log_api_response == true ) {
+		$log_string  = '==>' . $api_url;
+		$log_string .= '-::-' . serialize( $api_args );
+		$log_string .= '-::-' . serialize( $api_response );
+
+		// $logs = new Connect_Tutor_Lms_Discord_Add_On_Logs();
+		// $logs->write_api_response_logs( $log_string, $user_id );
+	}
+}
+
+/**
+ * Check API call response and detect conditions which can cause of action failure and retry should be attemped.
+ *
+ * @param ARRAY|OBJECT $api_response The API resposne.
+ * @param BOOLEAN
+ */
+function ets_tutor_lms_discord_check_api_errors( $api_response ) {
+	// check if response code is a WordPress error.
+	if ( is_wp_error( $api_response ) ) {
+		return true;
+	}
+
+	// First Check if response contain codes which should not get re-try.
+	$body = json_decode( wp_remote_retrieve_body( $api_response ), true );
+	if ( isset( $body['code'] ) && in_array( $body['code'], CONNECT_DISCORD_TUTOR_LMS_DONOT_RETRY_HTTP_CODES ) ) {
+		return false;
+	}
+
+	$response_code = strval( $api_response['response']['code'] );
+	if ( isset( $api_response['response']['code'] ) && in_array( $response_code, CONNECT_DISCORD_TUTOR_LMS_DONOT_RETRY_HTTP_CODES ) ) {
+		return false;
+	}
+
+	// check if response code is in the range of HTTP error.
+	if ( ( 400 <= absint( $response_code ) ) && ( absint( $response_code ) <= 599 ) ) {
+		return true;
+	}
+}
+
+/**
+ * Return the discord user avatar.
+ *
+ * @param INT    $discord_user_id The discord usr ID.
+ * @param STRING $user_avatar Discord avatar hash value.
+ * @param STRING $restrictcontent_discord The html.
+ *
+ * @return STRING
+ */
+function ets_tutor_lms_discord_get_user_avatar( $discord_user_id, $user_avatar, $restrictcontent_discord ) {
+	if ( $user_avatar ) {
+		$avatar_url               = '<img class="ets-tutor-lms-user-avatar" src="https://cdn.discordapp.com/avatars/' . $discord_user_id . '/' . $user_avatar . '.png" />';
+		$restrictcontent_discord .= $avatar_url;
+	}
+	return $restrictcontent_discord;
 }
