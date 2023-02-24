@@ -541,4 +541,118 @@ class Connect_Discord_Tutor_Lms_Public {
 			}
 		}
 	}
+
+	/**
+	 * Discord DM a member using bot.
+	 *
+	 * @param INT    $user_id Student's id.
+	 * @param MIXED  $course
+	 * @param STRING $type (warning|expired).
+	 * @param INT    $related (quiz_attempt|Realted achievment post)
+	 */
+	public function ets_tutor_lms_discord_discord_handler_send_dm( $user_id, $courses, $type = 'warning', $related = '' ) {
+		$discord_user_id   = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_user_id', true ) ) );
+		$discord_bot_token = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_bot_token' ) ) );
+
+		$ets_tutor_lms_discord_welcome_message = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_welcome_message' ) ) );
+		$embed_messaging_feature               = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_embed_messaging_feature' ) ) );
+
+		// Check if DM channel is already created for the user.
+		$user_dm = get_user_meta( $user_id, '_ets_tutor_lms_discord_dm_channel', true );
+
+		if ( ! isset( $user_dm['id'] ) || $user_dm === false || empty( $user_dm ) ) {
+			$this->ets_tutor_lms_discord_create_member_dm_channel( $user_id );
+			$user_dm       = get_user_meta( $user_id, '_ets_tutor_lms_discord_dm_channel', true );
+			$dm_channel_id = $user_dm['id'];
+		} else {
+			$dm_channel_id = $user_dm['id'];
+		}
+
+		if ( $type == 'welcome' ) {
+
+			$message = ets_tutor_lms_discord_get_formatted_dm( $user_id, $courses, $ets_tutor_lms_discord_welcome_message );
+		}
+
+		$creat_dm_url = CONNECT_DISCORD_TUTOR_LMS_API_URL . '/channels/' . $dm_channel_id . '/messages';
+
+		/**
+		 *
+		 * Send rich embed message for $type == 'achievement_earned' ( support Badge  achievement)
+		 */
+
+		if ( $embed_messaging_feature ) {
+			$dm_args = array(
+				'method'  => 'POST',
+				'headers' => array(
+					'Content-Type'  => 'application/json',
+					'Authorization' => 'Bot ' . $discord_bot_token,
+				),
+				'body'    => ets_tutor_lms_discord_get_rich_embed_message( trim( $message ) ),
+			);
+		} else {
+			$dm_args = array(
+				'method'  => 'POST',
+				'headers' => array(
+					'Content-Type'  => 'application/json',
+					'Authorization' => 'Bot ' . $discord_bot_token,
+				),
+				'body'    => wp_json_encode(
+					array(
+						'content' => sanitize_text_field( trim( wp_unslash( $message ) ) ),
+					)
+				),
+			);
+		}
+
+		$dm_response = wp_remote_post( $creat_dm_url, $dm_args );
+		ets_tutor_lms_discord_log_api_response( $user_id, $creat_dm_url, $dm_args, $dm_response );
+		$dm_response_body = json_decode( wp_remote_retrieve_body( $dm_response ), true );
+		if ( ets_tutor_lms_discord_check_api_errors( $dm_response ) ) {
+			// Tutro_Discord_Addon_Logs::write_api_response_logs( $dm_response_body, $user_id, debug_backtrace()[0] );
+			// this should be catch by Action schedule failed action.
+			throw new Exception( 'Failed in function ets_tutor_lms_discord_handler_send_dm' );
+		}
+	}
+
+	/**
+	 * Create DM channel for a give user_id
+	 *
+	 * @param INT $user_id
+	 * @return MIXED
+	 */
+	public function ets_tutor_lms_discord_create_member_dm_channel( $user_id ) {
+		$discord_user_id       = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_user_id', true ) ) );
+		$discord_bot_token     = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_bot_token' ) ) );
+		$create_channel_dm_url = CONNECT_DISCORD_TUTOR_LMS_API_URL . '/users/@me/channels';
+		$dm_channel_args       = array(
+			'method'  => 'POST',
+			'headers' => array(
+				'Content-Type'  => 'application/json',
+				'Authorization' => 'Bot ' . $discord_bot_token,
+			),
+			'body'    => json_encode(
+				array(
+					'recipient_id' => $discord_user_id,
+				)
+			),
+		);
+
+		$created_dm_response = wp_remote_post( $create_channel_dm_url, $dm_channel_args );
+		ets_tutor_lms_discord_log_api_response( $user_id, $create_channel_dm_url, $dm_channel_args, $created_dm_response );
+		$response_arr = json_decode( wp_remote_retrieve_body( $created_dm_response ), true );
+
+		if ( is_array( $response_arr ) && ! empty( $response_arr ) ) {
+			// check if there is error in create dm response
+			if ( array_key_exists( 'code', $response_arr ) || array_key_exists( 'error', $response_arr ) ) {
+				// Tutor_Discord_Addon_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+				if ( ets_tutor_lms_discord_check_api_errors( $created_dm_response ) ) {
+					// this should be catch by Action schedule failed action.
+					throw new Exception( 'Failed in function ets_tutor_lms_discord_create_member_dm_channel' );
+				}
+			} else {
+				update_user_meta( $user_id, '_ets_tutor_lms_discord_dm_channel', $response_arr );
+			}
+		}
+		return $response_arr;
+	}
 }
