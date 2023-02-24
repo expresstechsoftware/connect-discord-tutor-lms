@@ -97,6 +97,12 @@ class Connect_Discord_Tutor_Lms_Public {
 		 */
 
 		wp_register_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/connect-discord-tutor-lms-public.js', array( 'jquery' ), $this->version, false );
+		$script_params = array(
+			'admin_ajax'                  => admin_url( 'admin-ajax.php' ),
+			'permissions_const'           => CONNECT_DISCORD_TUTOR_LMS_OAUTH_SCOPES,
+			'ets_tutor_lms_discord_nonce' => wp_create_nonce( 'ets-tutor-lms-discord-ajax-nonce' ),
+		);
+		wp_localize_script( $this->plugin_name, 'etsTutorLms', $script_params );
 
 	}
 
@@ -654,5 +660,153 @@ class Connect_Discord_Tutor_Lms_Public {
 			}
 		}
 		return $response_arr;
+	}
+
+	/**
+	 *
+	 */
+	public function ets_tutor_lms_disconnect_from_discord() {
+
+		if ( ! is_user_logged_in() ) {
+			wp_send_json_error( 'Unauthorized user', 401 );
+			exit();
+		}
+
+		// Check for nonce security
+		if ( ! wp_verify_nonce( $_POST['ets_tutor_lms_discord_nonce'], 'ets-tutor-lms-discord-ajax-nonce' ) ) {
+				wp_send_json_error( 'You do not have sufficient rights', 403 );
+				exit();
+		}
+		$user_id              = sanitize_text_field( trim( $_POST['user_id'] ) );
+		$kick_upon_disconnect = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_kick_upon_disconnect' ) ) );
+		if ( $user_id ) {
+			delete_user_meta( $user_id, '_ets_tutor_lms_discord_access_token' );
+			delete_user_meta( $user_id, '_ets_tutor_lms_discord_refresh_token' );
+			$user_roles = ets_tutor_lms_discord_get_user_roles( $user_id );
+			if ( $kick_upon_disconnect ) {
+
+				if ( is_array( $user_roles ) ) {
+					foreach ( $user_roles as $user_role ) {
+						$this->delete_discord_role( $user_id, $user_role );
+					}
+				}
+			} else {
+				$this->delete_member_from_guild( $user_id, false );
+			}
+		}
+		$event_res = array(
+			'status'  => 1,
+			'message' => 'Successfully disconnected',
+		);
+		wp_send_json( $event_res );
+		exit();
+	}
+
+	/**
+	 * Schedule delete discord role for a student
+	 *
+	 * @param INT  $user_id
+	 * @param INT  $ets_tutor_lms_discord_role_id
+	 * @param BOOL $is_schedule
+	 * @return OBJECT API response
+	 */
+	public function delete_discord_role( $user_id, $ets_tutor_lms_discord_role_id, $is_schedule = true ) {
+		if ( $is_schedule ) {
+			as_schedule_single_action( ets_tutor_lms_discord_get_random_timestamp( ets_tutor_lms_discord_get_highest_last_attempt_timestamp() ), 'ets_tutor_lms_discord_as_schedule_delete_role', array( $user_id, $ets_tutor_lms_discord_role_id, $is_schedule ), CONNECT_DISCORD_TUTOR_LMS_AS_GROUP_NAME );
+		} else {
+			$this->ets_tutor_lms_discord_as_handler_delete_memberrole( $user_id, $ets_tutor_lms_discord_role_id, $is_schedule );
+		}
+	}
+
+	/**
+	 * Action Schedule handler to process delete role of a student.
+	 *
+	 * @param INT  $user_id
+	 * @param INT  $ets_tutor_lms_discord_role_id
+	 * @param BOOL $is_schedule
+	 * @return OBJECT API response
+	 */
+	public function ets_tutor_lms_discord_as_handler_delete_memberrole( $user_id, $ets_tutor_lms_discord_role_id, $is_schedule = true ) {
+
+		$guild_id                       = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_server_id' ) ) );
+		$_ets_tutor_lms_discord_user_id = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_user_id', true ) ) );
+		$discord_bot_token              = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_bot_token' ) ) );
+		$discord_delete_role_api_url    = CONNECT_DISCORD_TUTOR_LMS_API_URL . 'guilds/' . $guild_id . '/members/' . $_ets_tutor_lms_discord_user_id . '/roles/' . $ets_tutor_lms_discord_role_id;
+		if ( $_ets_tutor_lms_discord_user_id ) {
+			$param = array(
+				'method'  => 'DELETE',
+				'headers' => array(
+					'Content-Type'   => 'application/json',
+					'Authorization'  => 'Bot ' . $discord_bot_token,
+					'Content-Length' => 0,
+				),
+			);
+
+			$response = wp_remote_request( $discord_delete_role_api_url, $param );
+			ets_tutor_lms_discord_log_api_response( $user_id, $discord_delete_role_api_url, $param, $response );
+			if ( ets_tutor_lms_discord_check_api_errors( $response ) ) {
+				$response_arr = json_decode( wp_remote_retrieve_body( $response ), true );
+				// Tutor_Discord_Addon_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+				if ( $is_schedule ) {
+					// this exception should be catch by action scheduler.
+					throw new Exception( 'Failed in function ets_tutor_lms_discord_as_handler_delete_memberrole' );
+				}
+			}
+			return $response;
+		}
+	}
+
+	/**
+	 * Schedule delete existing user from guild
+	 *
+	 * @param INT  $user_id
+	 * @param BOOL $is_schedule
+	 * @param NONE
+	 */
+	public function delete_member_from_guild( $user_id, $is_schedule = true ) {
+		if ( $is_schedule && isset( $user_id ) ) {
+
+			as_schedule_single_action( ets_tutor_lms_discord_get_random_timestamp( ets_tutor_lms_discord_get_highest_last_attempt_timestamp() ), 'ets_tutor_lms_discord_as_schedule_delete_member', array( $user_id, $is_schedule ), CONNECT_DISCORD_TUTOR_LMS_AS_GROUP_NAME );
+		} else {
+			if ( isset( $user_id ) ) {
+				$this->ets_tutor_lms_discord_as_handler_delete_member_from_guild( $user_id, $is_schedule );
+			}
+		}
+	}
+
+	/**
+	 * AS Handling member delete from huild
+	 *
+	 * @param INT  $user_id
+	 * @param BOOL $is_schedule
+	 * @return OBJECT API response
+	 */
+	public function ets_tutor_lms_discord_as_handler_delete_member_from_guild( $user_id, $is_schedule ) {
+		$guild_id                       = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_server_id' ) ) );
+		$discord_bot_token              = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_bot_token' ) ) );
+		$_ets_tutor_lms_discord_user_id = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_user_id', true ) ) );
+		$guilds_delete_memeber_api_url  = CONNECT_DISCORD_TUTOR_LMS_API_URL . 'guilds/' . $guild_id . '/members/' . $_ets_tutor_lms_discord_user_id;
+		$guild_args                     = array(
+			'method'  => 'DELETE',
+			'headers' => array(
+				'Content-Type'  => 'application/json',
+				'Authorization' => 'Bot ' . $discord_bot_token,
+			),
+		);
+		$guild_response                 = wp_remote_post( $guilds_delete_memeber_api_url, $guild_args );
+
+		ets_tutor_lms_discord_log_api_response( $user_id, $guilds_delete_memeber_api_url, $guild_args, $guild_response );
+		if ( ets_tutor_lms_discord_check_api_errors( $guild_response ) ) {
+			$response_arr = json_decode( wp_remote_retrieve_body( $guild_response ), true );
+			// Tutor_Discord_Addon_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+			if ( $is_schedule ) {
+				// this exception should be catch by action scheduler.
+				throw new Exception( 'Failed in function ets_tutor_lms_discord_as_handler_delete_member_from_guild' );
+			}
+		}
+
+		/*Delete all usermeta related to discord connection*/
+		ets_tutor_lms_discord_remove_usermeta( $user_id );
+
 	}
 }
