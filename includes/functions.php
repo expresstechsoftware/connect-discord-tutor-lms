@@ -428,6 +428,45 @@ function ets_tutor_lms_discord_get_rich_embed_message( $message ) {
 			);
 		}
 	}
+
+	$rich_embed_message = json_encode(
+		array(
+			'content'    => '',
+			'username'   => $BLOG_NAME,
+			'avatar_url' => $blog_logo_thumbnail,
+			'tts'        => false,
+			'embeds'     => array(
+				array(
+					'title'       => '',
+					'type'        => 'rich',
+					'description' => $BLOG_DESCRIPTION,
+					'url'         => '',
+					'timestamp'   => $timestamp,
+					'color'       => hexdec( '3366ff' ),
+					'footer'      => array(
+						'text'     => $BLOG_NAME,
+						'icon_url' => $blog_logo_thumbnail,
+					),
+					'image'       => array(
+						'url' => $blog_logo_full,
+					),
+					'thumbnail'   => array(
+						'url' => $blog_logo_thumbnail,
+					),
+					'author'      => array(
+						'name' => $BLOG_NAME,
+						'url'  => $SITE_URL,
+					),
+					'fields'      => $fields,
+
+				),
+			),
+
+		),
+		JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+	);
+
+	return $rich_embed_message;
 }
 
 /**
@@ -516,5 +555,21 @@ function ets_tutor_lms_discord_get_user_roles( $user_id ) {
 
 		return null;
 	}
+
+}
+
+/**
+ * Remove user meta.
+ *
+ * @param INT $user_id
+ */
+function ets_tutor_lms_discord_remove_usermeta( $user_id ) {
+
+	global $wpdb;
+
+	$usermeta_table      = $wpdb->prefix . 'usermeta';
+	$usermeta_sql        = 'DELETE FROM ' . $usermeta_table . " WHERE `user_id` = %d AND  `meta_key` LIKE '_ets_tutor_lms_discord%'; ";
+	$delete_usermeta_sql = $wpdb->prepare( $usermeta_sql, $user_id );
+	$wpdb->query( $delete_usermeta_sql );
 
 }
