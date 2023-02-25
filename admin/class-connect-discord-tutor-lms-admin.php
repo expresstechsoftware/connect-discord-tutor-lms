@@ -401,7 +401,7 @@ class Connect_Discord_Tutor_Lms_Admin {
 		$ets_tutor_lms_discord_welcome_message         = isset( $_POST['ets_tutor_lms_discord_welcome_message'] ) ? sanitize_textarea_field( trim( $_POST['ets_tutor_lms_discord_welcome_message'] ) ) : '';
 		$ets_tutor_lms_discord_course_complete_message = isset( $_POST['ets_tutor_lms_discord_course_complete_message'] ) ? sanitize_textarea_field( trim( $_POST['ets_tutor_lms_discord_course_complete_message'] ) ) : '';
 
-		$ets_tutor_lms_discord_send_course_enrolled_dm         = isset( $_POST['ets_tutor_lms_discord_send_course_enrolled_dm'] ) ? sanitize_textarea_field( trim( $_POST['ets_tutor_lms_discord_send_course_enrolled_dm'] ) ) : '';
+		$ets_tutor_lms_discord_lesson_complete_message = isset( $_POST['ets_tutor_lms_discord_lesson_complete_message'] ) ? sanitize_textarea_field( trim( $_POST['ets_tutor_lms_discord_lesson_complete_message'] ) ) : '';
 		$ets_tutor_lms_discord_course_enrolled_message = isset( $_POST['ets_tutor_lms_discord_course_enrolled_message'] ) ? sanitize_textarea_field( trim( $_POST['ets_tutor_lms_discord_course_enrolled_message'] ) ) : '';
 
 		$retry_api_count      = isset( $_POST['ets_tutor_lms_retry_api_count'] ) ? sanitize_textarea_field( trim( $_POST['ets_tutor_lms_retry_api_count'] ) ) : '';
@@ -431,6 +431,17 @@ class Connect_Discord_Tutor_Lms_Admin {
 					update_option( 'ets_tutor_lms_discord_course_complete_message', $ets_tutor_lms_discord_course_complete_message );
 				} else {
 					update_option( 'ets_tutor_lms_discord_course_complete_message', '' );
+				}
+
+				if ( isset( $_POST['ets_tutor_lms_discord_send_lesson_complete_dm'] ) ) {
+					update_option( 'ets_tutor_lms_discord_send_lesson_complete_dm', true );
+				} else {
+					update_option( 'ets_tutor_lms_discord_send_lesson_complete_dm', false );
+				}
+				if ( isset( $_POST['ets_tutor_lms_discord_lesson_complete_message'] ) && $_POST['ets_tutor_lms_discord_lesson_complete_message'] != '' ) {
+					update_option( 'ets_tutor_lms_discord_lesson_complete_message', $ets_tutor_lms_discord_lesson_complete_message );
+				} else {
+					update_option( 'ets_tutor_lms_discord_lesson_complete_message', '' );
 				}
 
 				if ( isset( $_POST['ets_tutor_lms_discord_send_course_enrolled_dm'] ) ) {
