@@ -476,7 +476,7 @@ function ets_tutor_lms_discord_get_rich_embed_message( $message ) {
  * @param ARRAY $courses the student's list of sources
  * Merge fields: [TUTOR_LMS_STUDENT_NAME], [TUTOR_LMS_COURSES], [LLMS_STUDENT_NAME], [TUTOR_LMS_STUDENT_EMAIL], [SITE_URL], [BLOG_NAME]
  */
-function ets_tutor_lms_discord_get_formatted_dm( $user_id, $courses, $message ) {
+function ets_tutor_lms_discord_get_formatted_welcome_dm( $user_id, $courses, $message ) {
 
 	$user_obj         = get_user_by( 'id', $user_id );
 	$STUDENT_USERNAME = sanitize_text_field( $user_obj->user_login );
@@ -519,6 +519,61 @@ function ets_tutor_lms_discord_get_formatted_dm( $user_id, $courses, $message ) 
 			$COURSES,
 			$STUDENT_USERNAME,
 			$STUDENT_EMAIL,
+			$SITE_URL,
+			$BLOG_NAME,
+		);
+
+		return str_replace( $find, $replace, $message );
+
+}
+
+/**
+ * Get formatted message to send in DM
+ *
+ * @param INT   $user_id
+ * @param ARRAY $courses the student's list of sources
+ * Merge fields: [TUTOR_LMS_STUDENT_NAME], [TUTOR_LMS_COURSE_NAME], [SITE_URL], [BLOG_NAME]
+ */
+function ets_tutor_lms_discord_get_formatted_enrolled_dm( $user_id, $courses, $message ) {
+
+	$user_obj         = get_user_by( 'id', $user_id );
+	$STUDENT_USERNAME = sanitize_text_field( $user_obj->user_login );
+	$SITE_URL         = esc_url( get_bloginfo( 'url' ) );
+	$BLOG_NAME        = sanitize_text_field( get_bloginfo( 'name' ) );
+
+	$COURSES = '';
+	if ( is_array( $courses ) ) {
+		$args_courses = array(
+			'orderby'     => 'title',
+			'order'       => 'ASC',
+			'numberposts' => count( $courses ),
+			'post_type'   => 'courses',
+			'post__in'    => $courses,
+		);
+
+		$enrolled_courses = get_posts( $args_courses );
+		$lastKeyCourse    = array_key_last( $enrolled_courses );
+		$commas           = ', ';
+		foreach ( $enrolled_courses as $key => $course ) {
+			if ( $lastKeyCourse === $key ) {
+				$commas = ' ';
+			}
+			$COURSES .= esc_html( $course->post_title ) . $commas;
+		}
+	} else {
+		$enrolled_course = get_post( $courses );
+		$COURSES        .= ( ! empty( ( $enrolled_course->post_title ) ) ) ? esc_html( $enrolled_course->post_title ) : '';
+	}
+
+		$find    = array(
+			'[TUTOR_LMS_COURSE_NAME]',
+			'[TUTOR_LMS_STUDENT_NAME]',
+			'[SITE_URL]',
+			'[BLOG_NAME]',
+		);
+		$replace = array(
+			$COURSES,
+			$STUDENT_USERNAME,
 			$SITE_URL,
 			$BLOG_NAME,
 		);

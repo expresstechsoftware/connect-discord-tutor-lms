@@ -576,7 +576,13 @@ class Connect_Discord_Tutor_Lms_Public {
 
 		if ( $type == 'welcome' ) {
 
-			$message = ets_tutor_lms_discord_get_formatted_dm( $user_id, $courses, $ets_tutor_lms_discord_welcome_message );
+			$message = ets_tutor_lms_discord_get_formatted_welcome_dm( $user_id, $courses, $ets_tutor_lms_discord_welcome_message );
+		}
+
+		if ( $type == 'encroll_course' ){
+			$ets_tutor_lms_discord_course_enrolled_message = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_course_enrolled_message' ) ) );
+			$message = ets_tutor_lms_discord_get_formatted_enrolled_dm( $user_id, $courses, $ets_tutor_lms_discord_course_enrolled_message );
+
 		}
 
 		$creat_dm_url = CONNECT_DISCORD_TUTOR_LMS_API_URL . '/channels/' . $dm_channel_id . '/messages';
@@ -808,5 +814,46 @@ class Connect_Discord_Tutor_Lms_Public {
 		/*Delete all usermeta related to discord connection*/
 		ets_tutor_lms_discord_remove_usermeta( $user_id );
 
+	}
+
+	/**
+	 * Assign discod role when a student enrolls in a course.
+	 *
+	 * @param INT $course_id
+	 * @param INT $user_id
+	 * @param INT $isEnrolled
+	 * @return void
+	 */
+	public function ets_tutor_lms_discord_enrolled_course( $course_id, $user_id, $isEnrolled ) {
+
+		$access_token                       = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_access_token', true ) ) );
+		$refresh_token                      = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_refresh_token', true ) ) );
+		$ets_tutor_lms_discord_role_mapping = json_decode( get_option( 'ets_tutor_lms_discord_role_mapping' ), true );
+		$default_role                       = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_default_role_id' ) ) );
+
+		if ( is_array( $ets_tutor_lms_discord_role_mapping ) && array_key_exists( 'course_id_' . $course_id, $ets_tutor_lms_discord_role_mapping ) ) {
+			$discord_role = sanitize_text_field( trim( $ets_tutor_lms_discord_role_mapping[ 'course_id_' . $course_id ] ) );
+			if ( $discord_role && $discord_role != 'none' ) {
+				if ( $access_token && $refresh_token ) {
+
+					update_user_meta( $user_id, '_ets_tutor_lms_discord_role_id_for_' . $course_id, $discord_role );
+					$this->put_discord_role_api( $user_id, $discord_role );
+					// Sent a notification about the enrolled course
+					$ets_tutor_lms_discord_send_course_enrolled_dm = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_send_course_enrolled_dm' ) ) );
+					if ( $ets_tutor_lms_discord_send_course_enrolled_dm == true ){
+						as_schedule_single_action( ets_tutor_lms_discord_get_random_timestamp( ets_tutor_lms_discord_get_highest_last_attempt_timestamp() ), 'ets_tutor_lms_discord_as_send_dm', array( $user_id, $course_id, 'encroll_course' ), CONNECT_DISCORD_TUTOR_LMS_AS_GROUP_NAME );
+					}
+				}
+			}
+		}
+		if ( $access_token && $refresh_token ) {
+			if ( $default_role && $default_role != 'none' && isset( $user_id ) ) {
+				update_user_meta( $user_id, '_ets_tutor_lms_discord_last_default_role', $default_role );
+				$this->put_discord_role_api( $user_id, $default_role );
+			} else {
+				$default_role = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_last_default_role', true ) ) );
+				$this->delete_discord_role( $user_id, $default_role );
+			}
+		}
 	}
 }

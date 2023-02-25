@@ -35,6 +35,8 @@ class Connect_Discord_Tutor_Lms_Activator {
 		update_option( 'ets_tutor_lms_discord_welcome_message', 'Hi [TUTOR_LMS_STUDENT_NAME] ([TUTOR_LMS_STUDENT_EMAIL]), Welcome, Your courses [TUTOR_LMS_COURSES] at [SITE_URL] Thanks, Kind Regards, [BLOG_NAME]' );
 		update_option( 'ets_tutor_lms_discord_send_course_complete_dm', true );
 		update_option( 'ets_tutor_lms_discord_course_complete_message', 'Hi [TUTOR_LMS_STUDENT_NAME] ([TUTOR_LMS_STUDENT_EMAIL]), You have completed the course  [TUTOR_LMS_COURSE_NAME] at [TUTOR_LMS_COURSE_DATE] on website [SITE_URL], [BLOG_NAME]' );
+		update_option( 'ets_tutor_lms_discord_send_course_enrolled_dm', true );
+		update_option( 'ets_tutor_lms_discord_course_enrolled_message', 'Hi [TUTOR_LMS_STUDENT_NAME], you have been enrolled in course [TUTOR_LMS_COURSE_NAME] on website [SITE_URL], [BLOG_NAME' );
 		update_option( 'ets_tutor_lms_discord_retry_failed_api', true );
 		update_option( 'ets_tutor_lms_discord_kick_upon_disconnect', false );
 		update_option( 'ets_tutor_lms_discord_retry_api_count', 5 );
