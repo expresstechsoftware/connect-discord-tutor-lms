@@ -269,6 +269,35 @@
 		});
 		$('#ets_tutor_lms_discord_connect_button_bg_color').wpColorPicker();
 		$('#ets_tutor_lms_discord_disconnect_button_bg_color').wpColorPicker();
+
+				/*Clear log log call-back*/
+				$('#ets-tutor-lms-clrbtn').click(function (e) {
+					e.preventDefault();
+					$.ajax({
+						url: etsTutorLms.admin_ajax,
+							type: "POST",
+							data: { 'action': 'ets_tutor_lms_discord_clear_logs', 'ets_tutor_lms_discord_nonce': etsTutorLms.ets_tutor_lms_discord_nonce },
+							beforeSend: function () {
+								$(".clr-log.spinner").addClass("is-active").show();
+							},
+							success: function (data) {
+					 
+								if (data.error) {
+									// handle the error
+									alert(data.error.msg);
+								} else {
+															
+									$('.error-log').html("Clear logs Sucesssfully !");
+								}
+							},
+							error: function (response, textStatus, errorThrown ) {
+								console.log( textStatus + " :  " + response.status + " : " + errorThrown );
+							},
+							complete: function () {
+								$(".clr-log.spinner").removeClass("is-active").hide();
+							}
+						});
+					});
 			
 		}); // DOM ready 
 
