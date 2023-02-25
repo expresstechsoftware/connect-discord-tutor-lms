@@ -106,7 +106,7 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 			<?php $ets_tutor_lms_discord_lesson_complete_message_value = isset( $ets_tutor_lms_discord_lesson_complete_message ) ? $ets_tutor_lms_discord_lesson_complete_message : ''; ?>
 		<textarea class="ets_tutor_lms_discord_lesson_complete_message" name="ets_tutor_lms_discord_lesson_complete_message" id="ets_tutor_lms_discord_lesson_complete_message" row="25" cols="50"><?php echo esc_textarea( wp_unslash( $ets_tutor_lms_discord_lesson_complete_message_value ) ); ?></textarea> 
 	<br/>
-	<small>Merge fields:  [TUTOR_LMS_STUDENT_NAME], [TUTOR_LMS_STUDENT_EMAIL], [TUTOR_LMS_LESSON_NAME], [TUTOR_LMS_COURSE_LESSON_DATE], [SITE_URL], [BLOG_NAME]</small>
+	<small>Merge fields:  [TUTOR_LMS_STUDENT_NAME], [TUTOR_LMS_LESSON_NAME], [TUTOR_LMS_LESSON_DATE], [SITE_URL], [BLOG_NAME]</small>
 		</fieldset></td>
 	  </tr>
 

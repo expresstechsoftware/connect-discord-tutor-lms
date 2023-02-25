@@ -583,6 +583,44 @@ function ets_tutor_lms_discord_get_formatted_enrolled_dm( $user_id, $courses, $m
 }
 
 /**
+ * Get formatted message to send in lesson complete DM
+ *
+ * @param INT $user_id
+ * @param INT $lesson_id The lesson id.
+ * Merge fields:  [TUTOR_LMS_STUDENT_NAME], [TUTOR_LMS_LESSON_NAME], [TUTOR_LMS_LESSON_DATE], [SITE_URL], [BLOG_NAME]
+ */
+function ets_tutor_lms_discord_get_formatted_lesson_dm( $user_id, $lesson_id, $message ) {
+
+	$user_obj         = get_user_by( 'id', $user_id );
+	$STUDENT_USERNAME = sanitize_text_field( $user_obj->user_login );
+	$SITE_URL         = esc_url( get_bloginfo( 'url' ) );
+	$BLOG_NAME        = sanitize_text_field( get_bloginfo( 'name' ) );
+	$CURRENT_DATE = wp_date( sanitize_text_field( get_option('date_format' ) ) );
+
+	$completed_lesson = get_post( $lesson_id );
+	$LESSON = '';
+	$LESSON          .= ( ! empty( ( $completed_lesson->post_title ) ) ) ? esc_html( $completed_lesson->post_title ) : '';
+
+		$find    = array(
+			'[TUTOR_LMS_LESSON_NAME]',
+			'[TUTOR_LMS_STUDENT_NAME]',
+			'[TUTOR_LMS_LESSON_DATE]',
+			'[SITE_URL]',
+			'[BLOG_NAME]',
+		);
+		$replace = array(
+			$LESSON,
+			$STUDENT_USERNAME,
+			$CURRENT_DATE,
+			$SITE_URL,
+			$BLOG_NAME,
+		);
+
+		return str_replace( $find, $replace, $message );
+
+}
+
+/**
  * Get student's roles ids
  *
  * @param INT $user_id

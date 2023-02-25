@@ -579,6 +579,10 @@ class Connect_Discord_Tutor_Lms_Public {
 			$message = ets_tutor_lms_discord_get_formatted_welcome_dm( $user_id, $courses, $ets_tutor_lms_discord_welcome_message );
 		}
 
+		if ( $type == 'lesson_complete' ){
+			$ets_tutor_lms_discord_lesson_complete_message = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_lesson_complete_message' ) ) );
+			$message                                       = ets_tutor_lms_discord_get_formatted_lesson_dm( $user_id, $courses, $ets_tutor_lms_discord_lesson_complete_message );
+		}
 		if ( $type == 'encroll_course' ){
 			$ets_tutor_lms_discord_course_enrolled_message = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_course_enrolled_message' ) ) );
 			$message = ets_tutor_lms_discord_get_formatted_enrolled_dm( $user_id, $courses, $ets_tutor_lms_discord_course_enrolled_message );
@@ -853,6 +857,25 @@ class Connect_Discord_Tutor_Lms_Public {
 			} else {
 				$default_role = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_last_default_role', true ) ) );
 				$this->delete_discord_role( $user_id, $default_role );
+			}
+		}
+	}
+
+	/**
+	 * Send Discord message when user complete lesson
+	 *
+	 * @param INT $lesson_id
+	 * @param INT $user_id
+	 * @return void
+	 */
+	public function ets_tutor_lms_discord_lesson_completed_after( $lesson_id, $user_id ){
+		$access_token                       = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_access_token', true ) ) );
+		$refresh_token                      = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_refresh_token', true ) ) );
+		if ( $access_token && $refresh_token ) {
+
+			$ets_tutor_lms_discord_send_lesson_complete_dm = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_send_lesson_complete_dm' ) ) );
+			if ( $ets_tutor_lms_discord_send_lesson_complete_dm == true ){
+				as_schedule_single_action( ets_tutor_lms_discord_get_random_timestamp( ets_tutor_lms_discord_get_highest_last_attempt_timestamp() ), 'ets_tutor_lms_discord_as_send_dm', array( $user_id, $lesson_id, 'lesson_complete' ), CONNECT_DISCORD_TUTOR_LMS_AS_GROUP_NAME );
 			}
 		}
 	}
