@@ -5,6 +5,8 @@ $ets_tutor_lms_discord_welcome_message = sanitize_text_field( trim( get_option( 
 $ets_tutor_lms_discord_send_course_complete_dm = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_send_course_complete_dm' ) ) );
 $ets_tutor_lms_discord_course_complete_message = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_course_complete_message' ) ) );
 
+$ets_tutor_lms_discord_send_course_enrolled_dm = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_send_course_enrolled_dm' ) ) );
+$ets_tutor_lms_discord_course_enrolled_message = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_course_enrolled_message' ) ) );
 
 $embed_messaging_feature = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_embed_messaging_feature' ) ) );
 $retry_failed_api        = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_retry_failed_api' ) ) );
@@ -82,7 +84,27 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 	<br/>
 	<small>Merge fields: [TUTOR_LMS_STUDENT_NAME], [TUTOR_LMS_STUDENT_EMAIL], [TUTOR_LMS_COURSE_NAME], [TUTOR_LMS_COURSE_DATE], [SITE_URL], [BLOG_NAME]</small>
 		</fieldset></td>
-	  </tr>	       
+	  </tr>
+	  <tr>
+		<th scope="row"><?php esc_html_e( 'Send Course Enrolled message', 'connect-discord-tutor-lms' ); ?></th>
+		<td> <fieldset>
+		<input name="ets_tutor_lms_discord_send_course_enrolled_dm" type="checkbox" id="ets_tutor_lms_discord_send_course_enrolled_dm" 
+		<?php
+		if ( $ets_tutor_lms_discord_send_course_enrolled_dm == true ) {
+			echo esc_attr( 'checked="checked"' ); }
+		?>
+		 value="1">
+		</fieldset></td>
+	  </tr>
+	<tr>
+		<th scope="row"><?php esc_html_e( 'Course Enrolled message', 'connect-discord-tutor-lms' ); ?></th>
+		<td> <fieldset>
+			<?php $ets_tutor_lms_discord_course_enrolled_message_value = isset( $ets_tutor_lms_discord_course_enrolled_message ) ? wp_unslash( $ets_tutor_lms_discord_course_enrolled_message ) : ''; ?>
+		<textarea class="ets_tutor_lms_discord_course_enrolled_message" name="ets_tutor_lms_discord_course_enrolled_message" id="ets_tutor_lms_discord_course_enrolled_message" row="25" cols="50"><?php echo esc_textarea( $ets_tutor_lms_discord_course_enrolled_message_value ); ?></textarea> 
+	<br/>
+	<small>Merge fields: [TUTOR_LMS_STUDENT_NAME], [TUTOR_LMS_COURSE_NAME], [SITE_URL], [BLOG_NAME]</small>
+		</fieldset></td>
+	  </tr>		  	       
   <tr>
   <tr>	
 	  <tr>

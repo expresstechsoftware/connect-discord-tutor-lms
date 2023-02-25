@@ -576,7 +576,13 @@ class Connect_Discord_Tutor_Lms_Public {
 
 		if ( $type == 'welcome' ) {
 
-			$message = ets_tutor_lms_discord_get_formatted_dm( $user_id, $courses, $ets_tutor_lms_discord_welcome_message );
+			$message = ets_tutor_lms_discord_get_formatted_welcome_dm( $user_id, $courses, $ets_tutor_lms_discord_welcome_message );
+		}
+
+		if ( $type == 'encroll_course' ){
+			$ets_tutor_lms_discord_course_enrolled_message = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_course_enrolled_message' ) ) );
+			$message = ets_tutor_lms_discord_get_formatted_enrolled_dm( $user_id, $courses, $ets_tutor_lms_discord_course_enrolled_message );
+
 		}
 
 		$creat_dm_url = CONNECT_DISCORD_TUTOR_LMS_API_URL . '/channels/' . $dm_channel_id . '/messages';
@@ -832,8 +838,11 @@ class Connect_Discord_Tutor_Lms_Public {
 
 					update_user_meta( $user_id, '_ets_tutor_lms_discord_role_id_for_' . $course_id, $discord_role );
 					$this->put_discord_role_api( $user_id, $discord_role );
-					// Sent a notification about the course access update.
-					// as_schedule_single_action( ets_tutor_lms_discord_get_random_timestamp( ets_tutor_lms_discord_get_highest_last_attempt_timestamp() ), 'ets_tutor_lms_discord_as_send_dm', array( $user_id, $course_id, 'encroll_course' ), CONNECT_DISCORD_TUTOR_LMS_AS_GROUP_NAME );
+					// Sent a notification about the enrolled course
+					$ets_tutor_lms_discord_send_course_enrolled_dm = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_send_course_enrolled_dm' ) ) );
+					if ( $ets_tutor_lms_discord_send_course_enrolled_dm == true ){
+						as_schedule_single_action( ets_tutor_lms_discord_get_random_timestamp( ets_tutor_lms_discord_get_highest_last_attempt_timestamp() ), 'ets_tutor_lms_discord_as_send_dm', array( $user_id, $course_id, 'encroll_course' ), CONNECT_DISCORD_TUTOR_LMS_AS_GROUP_NAME );
+					}
 				}
 			}
 		}
