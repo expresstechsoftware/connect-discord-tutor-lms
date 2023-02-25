@@ -621,6 +621,67 @@ function ets_tutor_lms_discord_get_formatted_lesson_dm( $user_id, $lesson_id, $m
 }
 
 /**
+ * Get formatted message to send in DM
+ *
+ * @param INT   $user_id
+ * @param ARRAY $courses the student's list of sources
+ * Merge fields: [TUTOR_LMS_STUDENT_NAME], [TUTOR_LMS_STUDENT_EMAIL], [TUTOR_LMS_COURSE_NAME], [TUTOR_LMS_COURSE_DATE], [SITE_URL], [BLOG_NAME]
+ */
+function ets_tutor_lms_discord_get_formatted_course_dm( $user_id, $courses, $message ) {
+
+	$user_obj         = get_user_by( 'id', $user_id );
+	$STUDENT_USERNAME = sanitize_text_field( $user_obj->user_login );
+	$STUDENT_EMAIL    = sanitize_email( $user_obj->user_email );
+	$SITE_URL         = esc_url( get_bloginfo( 'url' ) );
+	$BLOG_NAME        = sanitize_text_field( get_bloginfo( 'name' ) );
+	$CURRENT_DATE = wp_date( sanitize_text_field( get_option('date_format' ) ) );
+
+	$COURSES = '';
+	if ( is_array( $courses ) ) {
+		$args_courses = array(
+			'orderby'     => 'title',
+			'order'       => 'ASC',
+			'numberposts' => count( $courses ),
+			'post_type'   => 'courses',
+			'post__in'    => $courses,
+		);
+
+		$enrolled_courses = get_posts( $args_courses );
+		$lastKeyCourse    = array_key_last( $enrolled_courses );
+		$commas           = ', ';
+		foreach ( $enrolled_courses as $key => $course ) {
+			if ( $lastKeyCourse === $key ) {
+				$commas = ' ';
+			}
+			$COURSES .= esc_html( $course->post_title ) . $commas;
+		}
+	} else {
+		$enrolled_course = get_post( $courses );
+		$COURSES        .= ( ! empty( ( $enrolled_course->post_title ) ) ) ? esc_html( $enrolled_course->post_title ) : '';
+	}
+
+		$find    = array(
+			'[TUTOR_LMS_COURSE_NAME]',
+			'[TUTOR_LMS_STUDENT_NAME]',
+			'[TUTOR_LMS_STUDENT_EMAIL]',
+			'[TUTOR_LMS_COURSE_DATE]',
+			'[SITE_URL]',
+			'[BLOG_NAME]',
+		);
+		$replace = array(
+			$COURSES,
+			$STUDENT_USERNAME,
+			$STUDENT_EMAIL,
+			$CURRENT_DATE,
+			$SITE_URL,
+			$BLOG_NAME,
+		);
+
+		return str_replace( $find, $replace, $message );
+
+}
+
+/**
  * Get student's roles ids
  *
  * @param INT $user_id
