@@ -42,7 +42,13 @@ if ( isset( $_GET['save_settings_msg'] ) ) {
 				<li class="skltbs-tab-item">
 				<button class="skltbs-tab" data-identity="logs" ><?php esc_html_e( 'Logs', 'connect-discord-tutor-lms' ); ?>	
 				</button>
-				</li> 														                            
+				</li> 
+				<li class="skltbs-tab-item">
+				<button class="skltbs-tab" data-identity="documentation" ><?php esc_html_e( 'Documentation', 'connect-discord-tutor-lms' ); ?>	
+				</button>				
+				<li class="skltbs-tab-item">
+				<button class="skltbs-tab" data-identity="support" ><?php esc_html_e( 'Support', 'connect-discord-tutor-lms' ); ?>	
+				</button>																		                            
 			</ul>
 			<div class="skltbs-panel-group">
 				<div id="ets_tutor_lms_application_details" class="tutor-lms-discord-tab-conetent skltbs-panel">
@@ -61,7 +67,13 @@ if ( isset( $_GET['save_settings_msg'] ) ) {
 				</div>	
 				<div id='ets_tutor_lms_discord_logs' class="tutor-lms-discord-tab-conetent skltbs-panel">
 				<?php require_once CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH . 'admin/partials/pages/connect-discord-tutor-lms-log.php'; ?>
-				</div>																								
+				</div>
+				<div id='ets_tutor_lms_discord_documentation' class="skltbs-panel">
+				<?php require_once CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH . 'admin/partials/pages/connect-discord-tutor-lms-documentation.php'; ?>
+				</div>				
+				<div id='ets_tutor_lms_discord_support' class="skltbs-panel">
+				<?php require_once CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH . 'admin/partials/pages/connect-discord-tutor-lms-support.php'; ?>
+				</div>																												
 			</div>  
 		</div>
 
