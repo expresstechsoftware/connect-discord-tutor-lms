@@ -170,7 +170,7 @@ class Connect_Discord_Tutor_Lms_Public {
 				$restrictcontent_discord                      .= '</div>';
 
 			} elseif ( ( ets_tutor_lms_discord_get_student_courses_ids( $user_id ) && $mapped_role_name )
-								|| ( ets_tutor_lms_discord_get_student_courses_ids( $user_id ) && ! $mapped_role_name && $default_role_name )
+								|| ( $default_role_name != 'none' )
 								|| ( $allow_none_student == 'yes' ) ) {
 
 				$connect_btn_bg_color     = 'style="background-color:' . $ets_tutor_lms_discord_connect_button_bg_color . '"';
@@ -334,10 +334,10 @@ class Connect_Discord_Tutor_Lms_Public {
 				);
 				$response = wp_remote_post( $discord_token_api_url, $args );
 				ets_tutor_lms_discord_log_api_response( $user_id, $discord_token_api_url, $args, $response );
-				// if ( ets_tutor_lms_discord_check_api_errors( $response ) ) {
-				// $response_arr = json_decode( wp_remote_retrieve_body( $response ), true );
-				// Connect_Tutor_Lms_Discord_Add_On_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
-				// }
+				if ( ets_tutor_lms_discord_check_api_errors( $response ) ) {
+					$response_arr = json_decode( wp_remote_retrieve_body( $response ), true );
+					Connect_Discord_Tutor_Lms_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+				}
 			}
 		} else {
 			$args     = array(
@@ -356,10 +356,10 @@ class Connect_Discord_Tutor_Lms_Public {
 			);
 			$response = wp_remote_post( $discord_token_api_url, $args );
 			ets_tutor_lms_discord_log_api_response( $user_id, $discord_token_api_url, $args, $response );
-			// if ( ets_tutor_lms_discord_check_api_errors( $response ) ) {
-			// $response_arr = json_decode( wp_remote_retrieve_body( $response ), true );
-			// Connect_Tutor_Lms_Discord_Add_On_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
-			// }
+			if ( ets_tutor_lms_discord_check_api_errors( $response ) ) {
+				$response_arr = json_decode( wp_remote_retrieve_body( $response ), true );
+				Connect_Discord_Tutor_Lms_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+			}
 		}
 		return $response;
 	}
@@ -388,7 +388,7 @@ class Connect_Discord_Tutor_Lms_Public {
 		ets_tutor_lms_discord_log_api_response( $user_id, $discord_cuser_api_url, $param, $user_response );
 
 		$response_arr = json_decode( wp_remote_retrieve_body( $user_response ), true );
-		// Connect_Tutor_Lms_Discord_Add_On_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+		Connect_Discord_Tutor_Lms_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
 		$user_body = json_decode( wp_remote_retrieve_body( $user_response ), true );
 		return $user_body;
 
@@ -466,7 +466,7 @@ class Connect_Discord_Tutor_Lms_Public {
 		if ( ets_tutor_lms_discord_check_api_errors( $guild_response ) ) {
 
 			$response_arr = json_decode( wp_remote_retrieve_body( $guild_response ), true );
-			// Connect_Tutor_Lms__Discord_Add_On_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+			Connect_Discord_Tutor_Lms_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
 			// this should be catch by Action schedule failed action.
 			throw new Exception( 'Failed in function ets_tutor_lms_discord_as_handler_add_member_to_guild' );
 		}
@@ -539,7 +539,7 @@ class Connect_Discord_Tutor_Lms_Public {
 			ets_tutor_lms_discord_log_api_response( $user_id, $discord_change_role_api_url, $param, $response );
 			if ( ets_tutor_lms_discord_check_api_errors( $response ) ) {
 				$response_arr = json_decode( wp_remote_retrieve_body( $response ), true );
-				// Connect_Tutor_Lms__Discord_Add_On_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+				Connect_Discord_Tutor_Lms_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
 				if ( $is_schedule ) {
 					// this exception should be catch by action scheduler.
 					throw new Exception( 'Failed in function ets_tutor_lms_discord_as_handler_put_member_role' );
@@ -579,19 +579,19 @@ class Connect_Discord_Tutor_Lms_Public {
 			$message = ets_tutor_lms_discord_get_formatted_welcome_dm( $user_id, $courses, $ets_tutor_lms_discord_welcome_message );
 		}
 
-		if ( $type == 'lesson_complete' ){
+		if ( $type == 'lesson_complete' ) {
 			$ets_tutor_lms_discord_lesson_complete_message = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_lesson_complete_message' ) ) );
 			$message                                       = ets_tutor_lms_discord_get_formatted_lesson_dm( $user_id, $courses, $ets_tutor_lms_discord_lesson_complete_message );
 		}
 
-		if ( $type == 'course_complete' ){
+		if ( $type == 'course_complete' ) {
 			$ets_tutor_lms_discord_course_complete_message = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_course_complete_message' ) ) );
 			$message                                       = ets_tutor_lms_discord_get_formatted_course_dm( $user_id, $courses, $ets_tutor_lms_discord_course_complete_message );
 		}
 
-		if ( $type == 'encroll_course' ){
+		if ( $type == 'encroll_course' ) {
 			$ets_tutor_lms_discord_course_enrolled_message = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_course_enrolled_message' ) ) );
-			$message = ets_tutor_lms_discord_get_formatted_enrolled_dm( $user_id, $courses, $ets_tutor_lms_discord_course_enrolled_message );
+			$message                                       = ets_tutor_lms_discord_get_formatted_enrolled_dm( $user_id, $courses, $ets_tutor_lms_discord_course_enrolled_message );
 
 		}
 
@@ -630,7 +630,7 @@ class Connect_Discord_Tutor_Lms_Public {
 		ets_tutor_lms_discord_log_api_response( $user_id, $creat_dm_url, $dm_args, $dm_response );
 		$dm_response_body = json_decode( wp_remote_retrieve_body( $dm_response ), true );
 		if ( ets_tutor_lms_discord_check_api_errors( $dm_response ) ) {
-			// Tutro_Discord_Addon_Logs::write_api_response_logs( $dm_response_body, $user_id, debug_backtrace()[0] );
+			Connect_Discord_Tutor_Lms_Logs::write_api_response_logs( $dm_response_body, $user_id, debug_backtrace()[0] );
 			// this should be catch by Action schedule failed action.
 			throw new Exception( 'Failed in function ets_tutor_lms_discord_handler_send_dm' );
 		}
@@ -666,7 +666,7 @@ class Connect_Discord_Tutor_Lms_Public {
 		if ( is_array( $response_arr ) && ! empty( $response_arr ) ) {
 			// check if there is error in create dm response
 			if ( array_key_exists( 'code', $response_arr ) || array_key_exists( 'error', $response_arr ) ) {
-				// Tutor_Discord_Addon_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+				Connect_Discord_Tutor_Lms_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
 				if ( ets_tutor_lms_discord_check_api_errors( $created_dm_response ) ) {
 					// this should be catch by Action schedule failed action.
 					throw new Exception( 'Failed in function ets_tutor_lms_discord_create_member_dm_channel' );
@@ -762,7 +762,7 @@ class Connect_Discord_Tutor_Lms_Public {
 			ets_tutor_lms_discord_log_api_response( $user_id, $discord_delete_role_api_url, $param, $response );
 			if ( ets_tutor_lms_discord_check_api_errors( $response ) ) {
 				$response_arr = json_decode( wp_remote_retrieve_body( $response ), true );
-				// Tutor_Discord_Addon_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+				Connect_Discord_Tutor_Lms_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
 				if ( $is_schedule ) {
 					// this exception should be catch by action scheduler.
 					throw new Exception( 'Failed in function ets_tutor_lms_discord_as_handler_delete_memberrole' );
@@ -814,7 +814,7 @@ class Connect_Discord_Tutor_Lms_Public {
 		ets_tutor_lms_discord_log_api_response( $user_id, $guilds_delete_memeber_api_url, $guild_args, $guild_response );
 		if ( ets_tutor_lms_discord_check_api_errors( $guild_response ) ) {
 			$response_arr = json_decode( wp_remote_retrieve_body( $guild_response ), true );
-			// Tutor_Discord_Addon_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+			Connect_Discord_Tutor_Lms_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
 			if ( $is_schedule ) {
 				// this exception should be catch by action scheduler.
 				throw new Exception( 'Failed in function ets_tutor_lms_discord_as_handler_delete_member_from_guild' );
@@ -850,7 +850,7 @@ class Connect_Discord_Tutor_Lms_Public {
 					$this->put_discord_role_api( $user_id, $discord_role );
 					// Sent a notification about the enrolled course
 					$ets_tutor_lms_discord_send_course_enrolled_dm = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_send_course_enrolled_dm' ) ) );
-					if ( $ets_tutor_lms_discord_send_course_enrolled_dm == true ){
+					if ( $ets_tutor_lms_discord_send_course_enrolled_dm == true ) {
 						as_schedule_single_action( ets_tutor_lms_discord_get_random_timestamp( ets_tutor_lms_discord_get_highest_last_attempt_timestamp() ), 'ets_tutor_lms_discord_as_send_dm', array( $user_id, $course_id, 'encroll_course' ), CONNECT_DISCORD_TUTOR_LMS_AS_GROUP_NAME );
 					}
 				}
@@ -874,13 +874,13 @@ class Connect_Discord_Tutor_Lms_Public {
 	 * @param INT $user_id
 	 * @return void
 	 */
-	public function ets_tutor_lms_discord_lesson_completed_after( $lesson_id, $user_id ){
-		$access_token                       = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_access_token', true ) ) );
-		$refresh_token                      = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_refresh_token', true ) ) );
+	public function ets_tutor_lms_discord_lesson_completed_after( $lesson_id, $user_id ) {
+		$access_token  = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_access_token', true ) ) );
+		$refresh_token = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_refresh_token', true ) ) );
 		if ( $access_token && $refresh_token ) {
 
 			$ets_tutor_lms_discord_send_lesson_complete_dm = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_send_lesson_complete_dm' ) ) );
-			if ( $ets_tutor_lms_discord_send_lesson_complete_dm == true ){
+			if ( $ets_tutor_lms_discord_send_lesson_complete_dm == true ) {
 				as_schedule_single_action( ets_tutor_lms_discord_get_random_timestamp( ets_tutor_lms_discord_get_highest_last_attempt_timestamp() ), 'ets_tutor_lms_discord_as_send_dm', array( $user_id, $lesson_id, 'lesson_complete' ), CONNECT_DISCORD_TUTOR_LMS_AS_GROUP_NAME );
 			}
 		}
@@ -893,15 +893,15 @@ class Connect_Discord_Tutor_Lms_Public {
 	 * @param INT $user_id
 	 * @return void
 	 */
-	public function ets_tutor_course_complete_after( $course_id, $user_id ){
-		$access_token                       = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_access_token', true ) ) );
-		$refresh_token                      = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_refresh_token', true ) ) );
+	public function ets_tutor_course_complete_after( $course_id, $user_id ) {
+		$access_token  = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_access_token', true ) ) );
+		$refresh_token = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_refresh_token', true ) ) );
 		if ( $access_token && $refresh_token ) {
 
 			$ets_tutor_lms_discord_send_course_complete_dm = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_send_course_complete_dm' ) ) );
-			if ( $ets_tutor_lms_discord_send_course_complete_dm == true ){
+			if ( $ets_tutor_lms_discord_send_course_complete_dm == true ) {
 				as_schedule_single_action( ets_tutor_lms_discord_get_random_timestamp( ets_tutor_lms_discord_get_highest_last_attempt_timestamp() ), 'ets_tutor_lms_discord_as_send_dm', array( $user_id, $course_id, 'course_complete' ), CONNECT_DISCORD_TUTOR_LMS_AS_GROUP_NAME );
 			}
 		}
-	}	
+	}
 }

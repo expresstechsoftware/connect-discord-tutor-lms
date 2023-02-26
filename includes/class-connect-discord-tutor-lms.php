@@ -106,6 +106,12 @@ class Connect_Discord_Tutor_Lms {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/libraries/action-scheduler/action-scheduler.php';
 
 		/**
+		 * The class responsible for Logs
+		 * core plugin.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-connect-discord-tutor-lms-logs.php';
+
+		/**
 		 * Common functions file.
 		 * core plugin.
 		 */
@@ -196,7 +202,7 @@ class Connect_Discord_Tutor_Lms {
 		$this->loader->add_filter( 'kses_allowed_protocols', $plugin_public, 'ets_tutor_lms_discord_allow_data_protocol' );
 		/** If load from page dashboard */
 		$this->loader->add_action( 'tutor_load_dashboard_template_before', $plugin_public, 'ets_tutor_lms_display_discord_button' );
-		$this->loader->add_action( 'tutor_dashboard/before_header_button', $plugin_public, 'ets_tutor_lms_display_discord_button' );
+		// $this->loader->add_action( 'tutor_dashboard/before_header_button', $plugin_public, 'ets_tutor_lms_display_discord_button' );
 		$this->loader->add_action( 'init', $plugin_public, 'ets_tutor_lms_discord_api_callback' );
 		$this->loader->add_action( 'ets_tutor_lms_discord_as_handle_add_member_to_guild', $plugin_public, 'ets_tutor_lms_discord_as_handler_add_member_to_guild', 10, 3 );
 		$this->loader->add_action( 'ets_tutor_lms_discord_as_schedule_member_put_role', $plugin_public, 'ets_tutor_lms_discord_as_handler_put_member_role', 10, 3 );
