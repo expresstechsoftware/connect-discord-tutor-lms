@@ -13,7 +13,7 @@
  * @package           Connect_Discord_Tutor_Lms
  *
  * @wordpress-plugin
- * Plugin Name:       Connect Discord TutorLMS
+ * Plugin Name:       Connect TutorLMS to Discord
  * Plugin URI:        https://www.expresstechsoftwares.com/connect-discord-tutor-lms
  * Description:       The plugin seamlessly integrates with the Tutor LMS platform, allowing admins to easily link their courses to private Discord servers.
  * Version:           1.0.0
