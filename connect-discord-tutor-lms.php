@@ -37,6 +37,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 define( 'CONNECT_DISCORD_TUTOR_LMS_VERSION', '1.0.0' );
 define( 'CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH', plugin_dir_path( __FILE__ ) );
+define( 'CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
 define( 'CONNECT_DISCORD_TUTOR_LMS_API_URL', 'https://discord.com/api/v10/' );
 define( 'CONNECT_DISCORD_TUTOR_LMS_BOT_PERMISSIONS', 8 );
 define( 'CONNECT_DISCORD_TUTOR_LMS_OAUTH_SCOPES', 'identify email guilds guilds.join' );
