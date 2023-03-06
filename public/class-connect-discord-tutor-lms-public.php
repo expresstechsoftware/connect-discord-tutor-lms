@@ -107,7 +107,7 @@ class Connect_Discord_Tutor_Lms_Public {
 	}
 
 	/**
-	 * Undocumented function
+	 * Build the Connect to discord button
 	 *
 	 * @return void
 	 */
@@ -188,18 +188,19 @@ class Connect_Discord_Tutor_Lms_Public {
 		wp_enqueue_style( $this->plugin_name );
 		wp_enqueue_script( $this->plugin_name );
 
-		return wp_kses( $restrictcontent_discord, ets_tutor_lms_discord_allowed_html() );
+		return $restrictcontent_discord;
 
 	}
 
 	/**
-	 * Undocumented function
+	 * Display connect to discord button for a user on their My profile screen.
 	 *
 	 * @return void
 	 */
 	public function ets_tutor_lms_display_discord_button() {
-
-		echo do_shortcode( '[tutor_lms_discord]' );
+		if ( is_user_logged_in() ) {
+			echo wp_kses( $this->ets_tutor_lms_add_discord_button(), ets_tutor_lms_discord_allowed_html() );
+		}
 	}
 
 	/**
