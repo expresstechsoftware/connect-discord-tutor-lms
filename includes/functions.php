@@ -108,11 +108,11 @@ function ets_tutor_lms_discord_update_bot_name_option() {
  * @return BOOL $status
  */
 function ets_tutor_lms_discord_check_saved_settings_status() {
-	$ets_tutor_lms_discord_client_id     = get_option( 'ets_tutor_lms_discord_client_id' );
-	$ets_tutor_lms_discord_client_secret = get_option( 'ets_tutor_lms_discord_client_secret' );
-	$ets_tutor_lms_discord_bot_token     = get_option( 'ets_tutor_lms_discord_bot_token' );
-	$ets_tutor_lms_discord_redirect_url  = get_option( 'ets_tutor_lms_discord_redirect_url' );
-	$ets_tutor_lms_discord_server_id     = get_option( 'ets_tutor_lms_discord_server_id' );
+	$ets_tutor_lms_discord_client_id     = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_client_id' ) ) );
+	$ets_tutor_lms_discord_client_secret = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_client_secret' ) ) );
+	$ets_tutor_lms_discord_bot_token     = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_bot_token' ) ) );
+	$ets_tutor_lms_discord_redirect_url  = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_redirect_url' ) ) );
+	$ets_tutor_lms_discord_server_id     = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_server_id' ) ) );
 
 	if ( $ets_tutor_lms_discord_client_id && $ets_tutor_lms_discord_client_secret && $ets_tutor_lms_discord_bot_token && $ets_tutor_lms_discord_redirect_url && $ets_tutor_lms_discord_server_id ) {
 			$status = true;
@@ -139,8 +139,8 @@ function ets_tutor_lms_write_api_response_logs( $response_arr, $user_id, $backtr
 	if ( $user_id ) {
 		$user_details = '::User Id:' . $user_id;
 	}
-	$log_api_response = get_option( 'ets_tutor_lms_discord_log_api_response' );
-	$uuid             = get_option( 'ets_tutor_lms_discord_uuid_file_name' );
+	$log_api_response = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_log_api_response' ) ) );
+	$uuid             = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_uuid_file_name' ) ) );
 	$log_file_name    = $uuid . Connect_Discord_Tutor_Lms_Admin::$log_file_name;
 
 	if ( is_array( $response_arr ) && array_key_exists( 'code', $response_arr ) ) {
