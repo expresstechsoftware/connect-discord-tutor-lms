@@ -68,6 +68,8 @@ function ets_get_tutor_lms_discord_formated_discord_redirect_url( $page_id ) {
 
 /**
  * Save the BOT name in options table.
+ *
+ * @return void
  */
 function ets_tutor_lms_discord_update_bot_name_option() {
 
@@ -171,12 +173,12 @@ function ets_tutor_lms_discord_get_student_courses_ids( $user_id ) {
 }
 
 /**
- * Undocumented function
+ * Return the 'Assigned Roles' message.
  *
- * @param [type] $mapped_role_name
- * @param [type] $default_role_name
- * @param [type] $restrictcontent_discord
- * @return void
+ * @param STRING $mapped_role_name
+ * @param STRING $default_role_name
+ * @param STRING $restrictcontent_discord
+ * @return STRING
  */
 function ets_tutor_lms_discord_roles_assigned_message( $mapped_role_name, $default_role_name, $restrictcontent_discord ) {
 
@@ -204,12 +206,10 @@ function ets_tutor_lms_discord_roles_assigned_message( $mapped_role_name, $defau
 }
 
 /**
- * Get allowed html using WordPress API function wp_kses
+ * Get allowed html using WordPress API function wp_kses.
  *
- * @param STRING $html_message
- * @return STRING $html_message
+ * @return ARRAY $html_message
  */
-
 function ets_tutor_lms_discord_allowed_html() {
 	$allowed_html = array(
 		'div'    => array(
@@ -348,8 +348,8 @@ function ets_tutor_lms_discord_log_api_response( $user_id, $api_url = '', $api_a
 		$log_string .= '-::-' . serialize( $api_args );
 		$log_string .= '-::-' . serialize( $api_response );
 
-		// $logs = new Connect_Tutor_Lms_Discord_Add_On_Logs();
-		// $logs->write_api_response_logs( $log_string, $user_id );
+		$logs = new Connect_Discord_Tutor_Lms_Logs();
+		$logs->write_api_response_logs( $log_string, $user_id );
 	}
 }
 
@@ -595,10 +595,10 @@ function ets_tutor_lms_discord_get_formatted_lesson_dm( $user_id, $lesson_id, $m
 	$STUDENT_USERNAME = sanitize_text_field( $user_obj->user_login );
 	$SITE_URL         = esc_url( get_bloginfo( 'url' ) );
 	$BLOG_NAME        = sanitize_text_field( get_bloginfo( 'name' ) );
-	$CURRENT_DATE = wp_date( sanitize_text_field( get_option('date_format' ) ) );
+	$CURRENT_DATE     = wp_date( sanitize_text_field( get_option( 'date_format' ) ) );
 
 	$completed_lesson = get_post( $lesson_id );
-	$LESSON = '';
+	$LESSON           = '';
 	$LESSON          .= ( ! empty( ( $completed_lesson->post_title ) ) ) ? esc_html( $completed_lesson->post_title ) : '';
 
 		$find    = array(
@@ -634,7 +634,7 @@ function ets_tutor_lms_discord_get_formatted_course_dm( $user_id, $courses, $mes
 	$STUDENT_EMAIL    = sanitize_email( $user_obj->user_email );
 	$SITE_URL         = esc_url( get_bloginfo( 'url' ) );
 	$BLOG_NAME        = sanitize_text_field( get_bloginfo( 'name' ) );
-	$CURRENT_DATE = wp_date( sanitize_text_field( get_option('date_format' ) ) );
+	$CURRENT_DATE     = wp_date( sanitize_text_field( get_option( 'date_format' ) ) );
 
 	$COURSES = '';
 	if ( is_array( $courses ) ) {
@@ -716,6 +716,8 @@ function ets_tutor_lms_discord_get_user_roles( $user_id ) {
  * Remove user meta.
  *
  * @param INT $user_id
+ *
+ * @return void
  */
 function ets_tutor_lms_discord_remove_usermeta( $user_id ) {
 
