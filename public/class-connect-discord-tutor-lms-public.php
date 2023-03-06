@@ -72,8 +72,8 @@ class Connect_Discord_Tutor_Lms_Public {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_register_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/connect-discord-tutor-lms-public.css', array(), $this->version, 'all' );
+		$min_css = ( defined( 'WP_DEBUG' ) && true === WP_DEBUG ) ? '' : '.min';
+		wp_register_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/connect-discord-tutor-lms-public' . $min_css . '.css', array(), $this->version, 'all' );
 
 	}
 
@@ -95,8 +95,8 @@ class Connect_Discord_Tutor_Lms_Public {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_register_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/connect-discord-tutor-lms-public.js', array( 'jquery' ), $this->version, false );
+		$min_js = ( defined( 'WP_DEBUG' ) && true === WP_DEBUG ) ? '' : '.min';
+		wp_register_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/connect-discord-tutor-lms-public' . $min_js . '.js', array( 'jquery' ), $this->version, false );
 		$script_params = array(
 			'admin_ajax'                  => admin_url( 'admin-ajax.php' ),
 			'permissions_const'           => CONNECT_DISCORD_TUTOR_LMS_OAUTH_SCOPES,
@@ -107,7 +107,7 @@ class Connect_Discord_Tutor_Lms_Public {
 	}
 
 	/**
-	 * Undocumented function
+	 * Build the Connect to discord button
 	 *
 	 * @return void
 	 */
@@ -188,18 +188,19 @@ class Connect_Discord_Tutor_Lms_Public {
 		wp_enqueue_style( $this->plugin_name );
 		wp_enqueue_script( $this->plugin_name );
 
-		return wp_kses( $restrictcontent_discord, ets_tutor_lms_discord_allowed_html() );
+		return $restrictcontent_discord;
 
 	}
 
 	/**
-	 * Undocumented function
+	 * Display connect to discord button for a user on their My profile screen.
 	 *
 	 * @return void
 	 */
 	public function ets_tutor_lms_display_discord_button() {
-
-		echo do_shortcode( '[tutor_lms_discord]' );
+		if ( is_user_logged_in() ) {
+			echo wp_kses( $this->ets_tutor_lms_add_discord_button(), ets_tutor_lms_discord_allowed_html() );
+		}
 	}
 
 	/**

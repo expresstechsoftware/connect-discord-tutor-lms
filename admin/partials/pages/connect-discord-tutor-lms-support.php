@@ -6,7 +6,7 @@ if ( $currentUser ) {
 }
 ?>
 <div class="contact-form ">
-	<form method="post" action="<?php echo esc_attr( get_site_url() . '/wp-admin/admin-post.php' ); ?>">
+	<form method="post" action="<?php echo esc_url( get_site_url() . '/wp-admin/admin-post.php' ); ?>">
 		<input type="hidden" name="action" value="tutor_lms_discord_send_support_mail">
 		<input type="hidden" name="current_url" value="<?php echo esc_url( ets_tutor_lms_discord_get_current_screen_url() ); ?>">
 	  <div class="ets-container">
