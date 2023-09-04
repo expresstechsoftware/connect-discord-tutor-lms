@@ -297,9 +297,43 @@
 								$(".clr-log.spinner").removeClass("is-active").hide();
 							}
 						});
-					});
+				});
+		
+					
 			
 		}); // DOM ready 
+
+
+		$(document).ready(function(){
+
+					
+			$(' .ets-discord-tutor-lms-review-notice > button.notice-dismiss' ).on('click', function() {
+			
+				$.ajax({
+					type: "POST",
+					dataType: "JSON",
+					url: etsTutorLms.admin_ajax,
+					data: { 
+						'action': 'tutor_lms_discord_notice_dismiss', 
+						'ets_tutor_lms_discord_nonce': etsTutorLms.ets_tutor_lms_discord_nonce
+					},
+					beforeSend: function () {
+						console.log('sending...');
+					},
+					success: function (response) {
+						console.log(response);
+					},
+					error: function (response) {
+						console.error(response);
+					},
+					complete: function () {
+						// 
+					}
+				});
+	});	
+
+
+		});
 
 	} // Admin
 	$.skeletabs.setDefaults({
