@@ -140,6 +140,8 @@ class Connect_Discord_Tutor_Lms {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-connect-discord-tutor-lms-public.php';
 
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-connect-discord-tutor-lms-admin-notices.php';
+
 		$this->loader = new Connect_Discord_Tutor_Lms_Loader();
 
 	}
@@ -183,6 +185,7 @@ class Connect_Discord_Tutor_Lms {
 		$this->loader->add_action( 'admin_post_tutor_lms_discord_advance_settings', $plugin_admin, 'ets_tutor_lms_discord_advance_settings' );
 		$this->loader->add_action( 'admin_post_tutor_lms_discord_save_appearance_settings', $plugin_admin, 'ets_tutor_lms_discord_save_appearance_settings' );
 		$this->loader->add_action( 'admin_post_tutor_lms_discord_send_support_mail', $plugin_admin, 'ets_tutor_lms_discord_send_support_mail' );
+		$this->loader->add_action( 'wp_ajax_tutor_lms_discord_notice_dismiss', $plugin_admin, 'ets_tutor_lms_discord_notice_dismiss' );
 
 	}
 
