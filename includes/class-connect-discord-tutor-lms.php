@@ -70,7 +70,7 @@ class Connect_Discord_Tutor_Lms {
 		if ( defined( 'CONNECT_DISCORD_TUTOR_LMS_VERSION' ) ) {
 			$this->version = CONNECT_DISCORD_TUTOR_LMS_VERSION;
 		} else {
-			$this->version = '1.0.1';
+			$this->version = '1.0.2';
 		}
 		$this->plugin_name = 'connect-discord-tutor-lms';
 
