@@ -621,3 +621,13 @@ div.ets-discord-tutor-lms-review-notice div.ets-discord-tutor-lms-notice-content
   border-radius: 50%;
   margin-left: 15px;
 }
+div.ets-discord-tutor-lms-review-notice div.ets-discord-tutor-lms-notice-content p.ets-discord-tutor-lms-signature {
+  display: flex; 
+  align-items: center;
+}
+div.ets-discord-tutor-lms-review-notice div.ets-discord-tutor-lms-notice-content img{
+  width: 45px;
+  height: auto;
+  border-radius: 50%;
+  margin-left: 15px;
+}
