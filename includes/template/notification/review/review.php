@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 <div class="ets-discord-tutor-lms-notice-content">
    <h1>Your <a href="https://wordpress.org/support/plugin/connect-tutorlms-to-discord/reviews/">feedback</a> is invaluable!</h1>
-   <p>If you've found value in My <b>Connect Tutor LMS to Discord</b>, we'd greatly appreciate your support by leaving a <b><a href="https://wordpress.org/support/plugin/connect-tutorlms-to-discord/reviews/">review &#x1F64F; on WordPress.</b> </a></p>
+   <p>If you've found value in My <b>Connect TutorLMS to Discord</b>, we'd greatly appreciate your support by leaving a <b><a href="https://wordpress.org/support/plugin/connect-tutorlms-to-discord/reviews/">review &#x1F64F; on WordPress.</b> </a></p>
    <p>It'll only take a couple of minutes and will go a long way in helping us reach more people.</p> 
    <p class="ets-discord-tutor-lms-signature">
 	  <b>Ravi Soni</b>, Co-founder 
