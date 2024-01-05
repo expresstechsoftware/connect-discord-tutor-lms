@@ -16,7 +16,7 @@
  * Plugin Name:       Connect TutorLMS to Discord
  * Plugin URI:        https://www.expresstechsoftwares.com/connect-discord-tutor-lms
  * Description:       The plugin seamlessly integrates with the Tutor LMS platform, allowing admins to easily link their courses to private Discord servers.
- * Version:           1.0.4
+ * Version:           1.0.5
  * Author:            ExpressTech Software Solutions Pvt. Ltd.
  * Author URI:        https://https://www.expresstechsoftwares.com
  * License:           GPL-2.0+
@@ -35,7 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'CONNECT_DISCORD_TUTOR_LMS_VERSION', '1.0.4' );
+define( 'CONNECT_DISCORD_TUTOR_LMS_VERSION', '1.0.5' );
 define( 'CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
 define( 'CONNECT_DISCORD_TUTOR_LMS_API_URL', 'https://discord.com/api/v10/' );
