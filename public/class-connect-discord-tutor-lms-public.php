@@ -837,6 +837,9 @@ class Connect_Discord_Tutor_Lms_Public {
 	 */
 	public function ets_tutor_lms_discord_enrolled_course( $course_id, $user_id, $isEnrolled ) {
 
+		if ( !$isEnrolled){
+			return;
+		}
 		$access_token                       = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_access_token', true ) ) );
 		$refresh_token                      = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_refresh_token', true ) ) );
 		$ets_tutor_lms_discord_role_mapping = json_decode( get_option( 'ets_tutor_lms_discord_role_mapping' ), true );
