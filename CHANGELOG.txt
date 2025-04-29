@@ -1,0 +1,6 @@
+
+= 1.1.0 =
+* Added new `[tutor_lms_login_with_discord]` shortcode.
+* Users can now log in or create an account using their Discord credentials.
+* WordPress accounts are automatically created using the Discord email.
+* A notification is sent to the user upon account creation.
