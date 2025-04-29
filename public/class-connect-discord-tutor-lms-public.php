@@ -51,7 +51,6 @@ class Connect_Discord_Tutor_Lms_Public {
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
-
 	}
 
 	/**
@@ -74,7 +73,6 @@ class Connect_Discord_Tutor_Lms_Public {
 		 */
 		$min_css = ( defined( 'WP_DEBUG' ) && true === WP_DEBUG ) ? '' : '.min';
 		wp_register_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/connect-discord-tutor-lms-public' . $min_css . '.css', array(), $this->version, 'all' );
-
 	}
 
 	/**
@@ -103,7 +101,6 @@ class Connect_Discord_Tutor_Lms_Public {
 			'ets_tutor_lms_discord_nonce' => wp_create_nonce( 'ets-tutor-lms-discord-ajax-nonce' ),
 		);
 		wp_localize_script( $this->plugin_name, 'etsTutorLms', $script_params );
-
 	}
 
 	/**
@@ -189,7 +186,6 @@ class Connect_Discord_Tutor_Lms_Public {
 		wp_enqueue_script( $this->plugin_name );
 
 		return $restrictcontent_discord;
-
 	}
 
 	/**
@@ -217,6 +213,33 @@ class Connect_Discord_Tutor_Lms_Public {
 	}
 
 	/**
+	 * Add discord button to the profile page
+	 *
+	 * @param array $user
+	 *
+	 * @return void
+	 */
+	public function ets_tutor_lms_url_action() {
+		if ( isset( $_GET['action'] ) && $_GET['action'] == 'tutor-lms-discord-login' ) {
+			$params                    = array(
+				'client_id'     => sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_client_id' ) ) ),
+				'redirect_uri'  => sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_redirect_url' ) ) ),
+				'response_type' => 'code',
+				'scope'         => 'identify email connections guilds guilds.join',
+			);
+			$discord_authorise_api_url = CONNECT_DISCORD_TUTOR_LMS_API_URL . 'oauth2/authorize?' . http_build_query( $params );
+
+			if ( isset( $_GET['current-location'] ) ) {
+				error_log( 'Set cookie : ' . $_GET['current-location'] );
+				setcookie( 'ets_tutor_lms_current_location_storage', filter_input( INPUT_GET, $_GET['current-location'] ), time() + 300, '/' );
+			}
+
+			wp_redirect( $discord_authorise_api_url, 302, get_site_url() );
+			exit;
+		}
+	}
+
+	/**
 	 * For authorization process call discord API
 	 *
 	 * @param NONE
@@ -225,18 +248,6 @@ class Connect_Discord_Tutor_Lms_Public {
 	public function ets_tutor_lms_discord_api_callback() {
 		if ( is_user_logged_in() ) {
 			$user_id = get_current_user_id();
-			if ( isset( $_GET['action'] ) && $_GET['action'] == 'tutor-lms-discord-login' ) {
-				$params                    = array(
-					'client_id'     => sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_client_id' ) ) ),
-					'redirect_uri'  => sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_redirect_url' ) ) ),
-					'response_type' => 'code',
-					'scope'         => 'identify email connections guilds guilds.join',
-				);
-				$discord_authorise_api_url = CONNECT_DISCORD_TUTOR_LMS_API_URL . 'oauth2/authorize?' . http_build_query( $params );
-
-				wp_redirect( $discord_authorise_api_url, 302, get_site_url() );
-				exit;
-			}
 
 			if ( isset( $_GET['code'] ) && isset( $_GET['via'] ) && $_GET['via'] == 'connect-tutor-lms-discord-addon' ) {
 				$code     = sanitize_text_field( trim( $_GET['code'] ) );
@@ -265,9 +276,9 @@ class Connect_Discord_Tutor_Lms_Public {
 							$user_body = $this->get_discord_current_user( $access_token );
 
 							if ( is_array( $user_body ) && array_key_exists( 'discriminator', $user_body ) ) {
-								$discord_user_number           = $user_body['discriminator'];
+
 								$discord_user_name             = $user_body['username'];
-								$discord_user_name_with_number = $discord_user_name . '#' . $discord_user_number;
+								$discord_user_name_with_number = $discord_user_name;
 								$discord_user_avatar           = $user_body['avatar'];
 								update_user_meta( $user_id, '_ets_tutor_lms_discord_username', $discord_user_name_with_number );
 								update_user_meta( $user_id, '_ets_tutor_lms_discord_avatar', $discord_user_avatar );
@@ -285,11 +296,80 @@ class Connect_Discord_Tutor_Lms_Public {
 								update_user_meta( $user_id, '_ets_tutor_lms_discord_user_id', $_ets_tutor_lms_discord_user_id );
 								$this->add_discord_member_in_guild( $_ets_tutor_lms_discord_user_id, $user_id, $access_token );
 							}
-						} else {
-
 						}
-					} else {
+					}
+				}
+			}
+		} elseif ( isset( $_GET['code'] ) && isset( $_GET['via'] ) && $_GET['via'] == 'connect-tutor-lms-discord-addon' ) {
 
+			$code     = sanitize_text_field( trim( $_GET['code'] ) );
+			$response = $this->create_discord_auth_token( $code, 'new_student' );
+			if ( ! empty( $response ) && ! is_wp_error( $response ) ) {
+				$res_body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+				if ( is_array( $res_body ) ) {
+					if ( array_key_exists( 'access_token', $res_body ) ) {
+						$access_token = sanitize_text_field( trim( $res_body['access_token'] ) );
+						$user_body    = $this->get_discord_current_user( $access_token, 'new_student' );
+
+						$discord_user_email = $user_body['email'];
+						$password           = wp_generate_password( 12, true, false );
+
+						if ( email_exists( $discord_user_email ) ) {
+							$current_user = get_user_by( 'email', $discord_user_email );
+							$user_id      = $current_user->ID;
+						} else {
+							$user_id = wp_create_user( $discord_user_email, $password, $discord_user_email );
+							wp_new_user_notification( $user_id, null, $password );
+						}
+						update_user_meta( $user_id, '_ets_tutor_lms_discord_access_token', $access_token );
+						$discord_exist_user_id = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_user_id', true ) ) );
+						if ( array_key_exists( 'refresh_token', $res_body ) ) {
+							$refresh_token = sanitize_text_field( trim( $res_body['refresh_token'] ) );
+							update_user_meta( $user_id, '_ets_tutor_lms_discord_refresh_token', $refresh_token );
+						}
+						if ( array_key_exists( 'expires_in', $res_body ) ) {
+							$expires_in = $res_body['expires_in'];
+							$date       = new DateTime();
+							$date->add( DateInterval::createFromDateString( '' . $expires_in . ' seconds' ) );
+							$token_expiry_time = $date->getTimestamp();
+							update_user_meta( $user_id, '_ets_tutor_lms_discord_expires_in', $token_expiry_time );
+						}
+
+						if ( is_array( $user_body ) && array_key_exists( 'discriminator', $user_body ) ) {
+
+							$discord_user_name             = $user_body['username'];
+							$discord_user_name_with_number = $discord_user_name;
+							update_user_meta( $user_id, '_ets_tutor_lms_discord_username', $discord_user_name_with_number );
+						}
+						if ( is_array( $user_body ) && array_key_exists( 'id', $user_body ) ) {
+							$_ets_tutor_lms_discord_user_id = sanitize_text_field( trim( $user_body['id'] ) );
+							if ( $discord_exist_user_id === $_ets_tutor_lms_discord_user_id ) {
+								$courses = map_deep( ets_tutor_lms_discord_get_student_courses_ids( $user_id ), 'sanitize_text_field' );
+								if ( is_array( $courses ) ) {
+									foreach ( $courses as $course_id ) {
+										$_ets_tutor_lms_discord_role_id = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_learndash_discord_role_id_for_' . $course_id, true ) ) );
+										if ( ! empty( $_ets_tutor_lms_discord_role_id ) && $_ets_tutor_lms_discord_role_id != 'none' ) {
+											$this->delete_discord_role( $user_id, $_ets_tutor_lms_discord_role_id );
+										}
+									}
+								}
+							}
+							update_user_meta( $user_id, '_ets_tutor_lms_discord_user_id', $_ets_tutor_lms_discord_user_id );
+
+							$credentials = array(
+								'user_login'    => $discord_user_email,
+								'user_password' => $password,
+							);
+							wp_set_auth_cookie( $user_id, false, '', '' );
+							wp_signon( $credentials, '' );
+							$discord_user_id = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_user_id', true ) ) );
+							$this->add_discord_member_in_guild( $discord_user_id, $user_id, $access_token );
+							if ( array_key_exists( 'ets_tutor_lms_current_location_storage', $_COOKIE ) && $_COOKIE['ets_tutor_lms_current_location_storage'] ) {
+								wp_safe_redirect( urldecode_deep( $_COOKIE['ets_tutor_lms_current_location_storage'] ) );
+								exit();
+							}
+						}
 					}
 				}
 			}
@@ -305,10 +385,34 @@ class Connect_Discord_Tutor_Lms_Public {
 	 */
 	public function create_discord_auth_token( $code, $user_id ) {
 		if ( ! is_user_logged_in() ) {
+			if ( isset( $code ) && ! empty( $code ) && $user_id == 'new_student' ) {
+				$discord_token_api_url = CONNECT_DISCORD_TUTOR_LMS_API_URL . 'oauth2/token';
+				$params                = array(
+					'method'  => 'POST',
+					'headers' => array(
+						'Content-Type' => 'application/x-www-form-urlencoded',
+					),
+					'body'    => array(
+						'client_id'     => sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_client_id' ) ) ),
+						'client_secret' => sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_client_secret' ) ) ),
+						'grant_type'    => 'authorization_code',
+						'code'          => $code,
+						'redirect_uri'  => sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_redirect_url' ) ) ),
+					),
+				);
+				$response              = wp_remote_post( $discord_token_api_url, $params );
+				ets_tutor_lms_discord_log_api_response( $user_id, $discord_token_api_url, $params, $response );
+				if ( ets_tutor_lms_discord_check_api_errors( $response ) ) {
+					$response_arr = json_decode( wp_remote_retrieve_body( $response ), true );
+					Connect_Discord_Tutor_Lms_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
+				}
 
-			wp_send_json_error( 'Unauthorized user', 401 );
-			exit();
+				return $response;
 
+			} else {
+				wp_send_json_error( 'Discord Auth Token Unauthorized user', 401 );
+				exit();
+			}
 		}
 
 		$response              = '';
@@ -371,9 +475,9 @@ class Connect_Discord_Tutor_Lms_Public {
 	 * @param STRING $access_token
 	 * @return OBJECT REST API response
 	 */
-	public function get_discord_current_user( $access_token ) {
-		if ( ! is_user_logged_in() ) {
-			wp_send_json_error( 'Unauthorized user', 401 );
+	public function get_discord_current_user( $access_token, $new_student = '' ) {
+		if ( ! is_user_logged_in() && $new_student == '' ) {
+			wp_send_json_error( 'Discord current user: Unauthorized user', 401 );
 			exit();
 		}
 		$user_id = get_current_user_id();
@@ -392,7 +496,6 @@ class Connect_Discord_Tutor_Lms_Public {
 		Connect_Discord_Tutor_Lms_Logs::write_api_response_logs( $response_arr, $user_id, debug_backtrace()[0] );
 		$user_body = json_decode( wp_remote_retrieve_body( $user_response ), true );
 		return $user_body;
-
 	}
 
 	/**
@@ -404,10 +507,10 @@ class Connect_Discord_Tutor_Lms_Public {
 	 * @return NONE
 	 */
 	public function add_discord_member_in_guild( $_ets_tutor_lms_discord_user_id, $user_id, $access_token ) {
-		if ( ! is_user_logged_in() ) {
-			wp_send_json_error( 'Unauthorized user', 401 );
-			exit();
-		}
+		// if ( ! is_user_logged_in() ) {
+		// wp_send_json_error( 'Add new member: Unauthorized user', 401 );
+		// exit();
+		// }
 		$enrolled_courses = map_deep( ets_tutor_lms_discord_get_student_courses_ids( $user_id ), 'sanitize_text_field' );
 		if ( $enrolled_courses !== null ) {
 			// It is possible that we may exhaust API rate limit while adding members to guild, so handling off the job to queue.
@@ -685,7 +788,7 @@ class Connect_Discord_Tutor_Lms_Public {
 	public function ets_tutor_lms_disconnect_from_discord() {
 
 		if ( ! is_user_logged_in() ) {
-			wp_send_json_error( 'Unauthorized user', 401 );
+			wp_send_json_error( 'Disconnect : Unauthorized user', 401 );
 			exit();
 		}
 
@@ -784,10 +887,8 @@ class Connect_Discord_Tutor_Lms_Public {
 		if ( $is_schedule && isset( $user_id ) ) {
 
 			as_schedule_single_action( ets_tutor_lms_discord_get_random_timestamp( ets_tutor_lms_discord_get_highest_last_attempt_timestamp() ), 'ets_tutor_lms_discord_as_schedule_delete_member', array( $user_id, $is_schedule ), CONNECT_DISCORD_TUTOR_LMS_AS_GROUP_NAME );
-		} else {
-			if ( isset( $user_id ) ) {
+		} elseif ( isset( $user_id ) ) {
 				$this->ets_tutor_lms_discord_as_handler_delete_member_from_guild( $user_id, $is_schedule );
-			}
 		}
 	}
 
@@ -824,7 +925,6 @@ class Connect_Discord_Tutor_Lms_Public {
 
 		/*Delete all usermeta related to discord connection*/
 		ets_tutor_lms_discord_remove_usermeta( $user_id );
-
 	}
 
 	/**
@@ -837,7 +937,7 @@ class Connect_Discord_Tutor_Lms_Public {
 	 */
 	public function ets_tutor_lms_discord_enrolled_course( $course_id, $user_id, $isEnrolled ) {
 
-		if ( !$isEnrolled){
+		if ( ! $isEnrolled ) {
 			return;
 		}
 		$access_token                       = sanitize_text_field( trim( get_user_meta( $user_id, '_ets_tutor_lms_discord_access_token', true ) ) );
@@ -907,5 +1007,47 @@ class Connect_Discord_Tutor_Lms_Public {
 				as_schedule_single_action( ets_tutor_lms_discord_get_random_timestamp( ets_tutor_lms_discord_get_highest_last_attempt_timestamp() ), 'ets_tutor_lms_discord_as_send_dm', array( $user_id, $course_id, 'course_complete' ), CONNECT_DISCORD_TUTOR_LMS_AS_GROUP_NAME );
 			}
 		}
+	}
+
+	/**
+	 * Add login with discord button.
+	 *
+	 * @return void
+	 */
+	public function ets_tutor_lms_add_login_with_discord_button() {
+
+		if ( is_user_logged_in() ) {
+			return;
+		}
+
+		$current_location_url    = rawurlencode( ets_tutor_lms_discord_get_current_screen_url() );
+		$login_with_discord_text = sanitize_text_field( trim( get_option( 'ets_tutor_lms_discord_non_login_button_text' ) ) );
+
+		$login_url = add_query_arg(
+			array(
+				'action'           => 'tutor-lms-discord-login',
+				'current-location' => $current_location_url,
+			),
+			home_url()
+		);
+
+		$login_with_discord_button  = '<div class="ets-tutor-lms-discord-button-wrapper">';
+		$login_with_discord_button .= '<a href="' . esc_url( $login_url ) . '" class="tutor-lms-discord-btn-connect ets-btn">';
+		$login_with_discord_button .= esc_html( $login_with_discord_text ) . Connect_Discord_Tutor_Lms::get_discord_logo_white();
+		$login_with_discord_button .= '</a>';
+		$login_with_discord_button .= '</div>';
+
+		wp_enqueue_style( $this->plugin_name );
+
+		return $login_with_discord_button;
+	}
+
+	/**
+	 * Add login form shortcode for Tutor LMS
+	 *
+	 * @return void
+	 */
+	public function ets_tutor_lms_woo_login_form() {
+		echo do_shortcode( '[tutor_lms_login_with_discord]' );
 	}
 }
