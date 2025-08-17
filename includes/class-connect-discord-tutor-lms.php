@@ -79,7 +79,6 @@ class Connect_Discord_Tutor_Lms {
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 		$this->define_common_hooks();
-
 	}
 
 	/**
@@ -103,47 +102,46 @@ class Connect_Discord_Tutor_Lms {
 		/**
 		 * The class responsible for defining all methods that help to schedule actions.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/libraries/action-scheduler/action-scheduler.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/libraries/action-scheduler/action-scheduler.php';
 
 		/**
 		 * The class responsible for Logs
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-connect-discord-tutor-lms-logs.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-connect-discord-tutor-lms-logs.php';
 
 		/**
 		 * Common functions file.
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/functions.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/functions.php';
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-connect-discord-tutor-lms-loader.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-connect-discord-tutor-lms-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-connect-discord-tutor-lms-i18n.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-connect-discord-tutor-lms-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-connect-discord-tutor-lms-admin.php';
+		require_once plugin_dir_path( __DIR__ ) . 'admin/class-connect-discord-tutor-lms-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-connect-discord-tutor-lms-public.php';
+		require_once plugin_dir_path( __DIR__ ) . 'public/class-connect-discord-tutor-lms-public.php';
 
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-connect-discord-tutor-lms-admin-notices.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-connect-discord-tutor-lms-admin-notices.php';
 
 		$this->loader = new Connect_Discord_Tutor_Lms_Loader();
-
 	}
 
 	/**
@@ -160,7 +158,6 @@ class Connect_Discord_Tutor_Lms {
 		$plugin_i18n = new Connect_Discord_Tutor_Lms_i18n();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-
 	}
 
 	/**
@@ -186,7 +183,6 @@ class Connect_Discord_Tutor_Lms {
 		$this->loader->add_action( 'admin_post_tutor_lms_discord_save_appearance_settings', $plugin_admin, 'ets_tutor_lms_discord_save_appearance_settings' );
 		$this->loader->add_action( 'admin_post_tutor_lms_discord_send_support_mail', $plugin_admin, 'ets_tutor_lms_discord_send_support_mail' );
 		$this->loader->add_action( 'wp_ajax_tutor_lms_discord_notice_dismiss', $plugin_admin, 'ets_tutor_lms_discord_notice_dismiss' );
-
 	}
 
 	/**
@@ -217,7 +213,12 @@ class Connect_Discord_Tutor_Lms {
 		$this->loader->add_action( 'tutor_after_enrolled', $plugin_public, 'ets_tutor_lms_discord_enrolled_course', 99, 3 );
 		$this->loader->add_action( 'tutor_lesson_completed_after', $plugin_public, 'ets_tutor_lms_discord_lesson_completed_after', 99, 2 );
 		$this->loader->add_action( 'tutor_course_complete_after', $plugin_public, 'ets_tutor_course_complete_after', 99, 3 );
-
+		$this->loader->add_shortcode( 'tutor_lms_login_with_discord', $plugin_public, 'ets_tutor_lms_add_login_with_discord_button' );
+		$this->loader->add_action( 'init', $plugin_public, 'ets_tutor_lms_url_action' );
+		// include_once ABSPATH . 'wp-admin/includes/plugin.php';
+		// if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+		// 	$this->loader->add_action( 'woocommerce_login_form_end', $plugin_public, 'ets_tutor_lms_woo_login_form' );
+		// }
 	}
 
 	/**
@@ -228,7 +229,7 @@ class Connect_Discord_Tutor_Lms {
 	 * @return STRING
 	 */
 	public static function get_discord_logo_white() {
-		$img  = file_get_contents( plugin_dir_path( dirname( __FILE__ ) ) . 'public/images/discord-logo-white.svg' );
+		$img  = file_get_contents( plugin_dir_path( __DIR__ ) . 'public/images/discord-logo-white.svg' );
 		$data = base64_encode( $img );
 
 		return '<img class="ets-discord-logo-white" src="data:image/svg+xml;base64,' . $data . '" />';
@@ -244,7 +245,6 @@ class Connect_Discord_Tutor_Lms {
 		$this->loader->add_action( 'action_scheduler_failed_execution', $this, 'ets_tutor_lms_discord_reschedule_failed_action' );
 		$this->loader->add_filter( 'action_scheduler_queue_runner_batch_size', $this, 'ets_tutor_lms_discord_queue_batch_size' );
 		$this->loader->add_filter( 'action_scheduler_queue_runner_concurrent_batches', $this, 'ets_tutor_lms_discord_concurrent_batches' );
-
 	}
 
 	/**
@@ -336,5 +336,4 @@ class Connect_Discord_Tutor_Lms {
 	public function get_version() {
 		return $this->version;
 	}
-
 }

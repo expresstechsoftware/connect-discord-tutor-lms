@@ -1,0 +1,9 @@
+= 1.1.1 =
+* Fix: Added event delegation in public.js to ensure the Discord disconnect button click works correctly when rendered dynamically (e.g., inside Gutenberg blocks).
+* Improvement: Enhanced compatibility to support multiple disconnect buttons on the same page.
+
+= 1.1.0 =
+* Added new `[tutor_lms_login_with_discord]` shortcode.
+* Users can now log in or create an account using their Discord credentials.
+* WordPress accounts are automatically created using the Discord email.
+* A notification is sent to the user upon account creation.

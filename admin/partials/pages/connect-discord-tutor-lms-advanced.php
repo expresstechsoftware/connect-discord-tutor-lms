@@ -22,10 +22,10 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 
 ?>
 <form method="post" action="<?php echo esc_url( get_site_url() . '/wp-admin/admin-post.php' ); ?>">
- <input type="hidden" name="action" value="tutor_lms_discord_advance_settings">
- <input type="hidden" name="current_url" value="<?php echo esc_url( ets_tutor_lms_discord_get_current_screen_url() ); ?>">   
+<input type="hidden" name="action" value="tutor_lms_discord_advance_settings">
+<input type="hidden" name="current_url" value="<?php echo esc_url( ets_tutor_lms_discord_get_current_screen_url() ); ?>">   
 <?php wp_nonce_field( 'save_tutor_lms_discord_general_advance_settings', 'ets_tutor_lms_discord_save_advance_settings' ); ?>
-  <table class="form-table" role="presentation">
+	<table class="form-table" role="presentation">
 	<tbody>
 	<tr>
 		<th scope="row"><?php esc_html_e( 'Shortcode:', 'connect-discord-tutor-lms' ); ?></th>
@@ -36,6 +36,14 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 		</fieldset></td>
 	</tr> 
 	<tr>
+		<th scope="row"><?php esc_html_e( 'Shortcode:', 'connect-discord-tutor-lms' ); ?></th>
+		<td> <fieldset>
+		[tutor_lms_login_with_discord]
+		<br/>
+		<small><?php esc_html_e( 'Use this shortcode [tutor_lms_login_with_discord] to display Login With Discord button on any page.', 'connect-discord-tutor-lms' ); ?></small>
+		</fieldset></td>
+	</tr>	
+	<tr>
 		<th scope="row"><?php esc_html_e( 'Use rich embed messaging feature?', 'connect-discord-tutor-lms' ); ?></th>
 		<td> <fieldset>
 		<input name="embed_messaging_feature" type="checkbox" id="embed_messaging_feature" 
@@ -43,11 +51,11 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 		if ( $embed_messaging_feature == true ) {
 			echo esc_attr( 'checked="checked"' ); }
 		?>
-		 value="1">
+		value="1">
 				<br/>
 				<small>Use [LINEBREAK] to split lines.</small>                
 		</fieldset></td>
-	  </tr> 	           
+		</tr>                
 	<tr>
 		<th scope="row"><?php esc_html_e( 'Send welcome message', 'connect-discord-tutor-lms' ); ?></th>
 		<td> <fieldset>
@@ -56,7 +64,7 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 		if ( $ets_tutor_lms_discord_send_welcome_dm == true ) {
 			echo esc_attr( 'checked="checked"' ); }
 		?>
-		 value="1">
+		value="1">
 		</fieldset></td>
 	</tr>
 	<tr>
@@ -77,9 +85,9 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 		if ( $ets_tutor_lms_discord_send_course_complete_dm == true ) {
 			echo esc_attr( 'checked="checked"' ); }
 		?>
-		 value="1">
+		value="1">
 		</fieldset></td>
-	  </tr>
+		</tr>
 	<tr>
 		<th scope="row"><?php esc_html_e( 'Course Complete message', 'connect-discord-tutor-lms' ); ?></th>
 		<td> <fieldset>
@@ -88,8 +96,8 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 	<br/>
 	<small>Merge fields: [TUTOR_LMS_STUDENT_NAME], [TUTOR_LMS_STUDENT_EMAIL], [TUTOR_LMS_COURSE_NAME], [TUTOR_LMS_COURSE_DATE], [SITE_URL], [BLOG_NAME]</small>
 		</fieldset></td>
-	  </tr>
-	  <tr>
+		</tr>
+		<tr>
 		<th scope="row"><?php esc_html_e( 'Send Lesson Complete message', 'connect-learndash-and-discord' ); ?></th>
 		<td> <fieldset>
 		<input name="ets_tutor_lms_discord_send_lesson_complete_dm" type="checkbox" id="ets_tutor_lms_discord_send_lesson_complete_dm" 
@@ -97,9 +105,9 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 		if ( $ets_tutor_lms_discord_send_lesson_complete_dm == true ) {
 			echo esc_attr( 'checked="checked"' ); }
 		?>
-		 value="1">
+		value="1">
 		</fieldset></td>
-	  </tr>
+		</tr>
 	<tr>
 		<th scope="row"><?php esc_html_e( 'Lesson Complete message', 'connect-learndash-and-discord' ); ?></th>
 		<td> <fieldset>
@@ -108,9 +116,9 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 	<br/>
 	<small>Merge fields:  [TUTOR_LMS_STUDENT_NAME], [TUTOR_LMS_LESSON_NAME], [TUTOR_LMS_LESSON_DATE], [SITE_URL], [BLOG_NAME]</small>
 		</fieldset></td>
-	  </tr>
+		</tr>
 
-	  <tr>
+		<tr>
 		<th scope="row"><?php esc_html_e( 'Send Course Enrolled message', 'connect-discord-tutor-lms' ); ?></th>
 		<td> <fieldset>
 		<input name="ets_tutor_lms_discord_send_course_enrolled_dm" type="checkbox" id="ets_tutor_lms_discord_send_course_enrolled_dm" 
@@ -118,9 +126,9 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 		if ( $ets_tutor_lms_discord_send_course_enrolled_dm == true ) {
 			echo esc_attr( 'checked="checked"' ); }
 		?>
-		 value="1">
+		value="1">
 		</fieldset></td>
-	  </tr>
+		</tr>
 	<tr>
 		<th scope="row"><?php esc_html_e( 'Course Enrolled message', 'connect-discord-tutor-lms' ); ?></th>
 		<td> <fieldset>
@@ -129,10 +137,10 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 	<br/>
 	<small>Merge fields: [TUTOR_LMS_STUDENT_NAME], [TUTOR_LMS_COURSE_NAME], [SITE_URL], [BLOG_NAME]</small>
 		</fieldset></td>
-	  </tr>		  	       
-  <tr>
-  <tr>	
-	  <tr>
+		</tr>                
+	<tr>
+	<tr>  
+		<tr>
 		<th scope="row"><?php esc_html_e( 'Retry Failed API calls', 'connect-discord-tutor-lms' ); ?></th>
 		<td> <fieldset>
 		<input name="retry_failed_api" type="checkbox" id="retry_failed_api" 
@@ -140,10 +148,10 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 		if ( $retry_failed_api == true ) {
 			echo esc_attr( 'checked="checked"' ); }
 		?>
-		 value="1">
+		value="1">
 		</fieldset></td>
-	  </tr>
-	  <tr>
+		</tr>
+		<tr>
 		<th scope="row"><?php esc_html_e( 'Don\'t kick students upon disconnect', 'connect-discord-tutor-lms' ); ?></th>
 		<td> <fieldset>
 		<input name="kick_upon_disconnect" type="checkbox" id="kick_upon_disconnect" 
@@ -151,9 +159,9 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 		if ( $kick_upon_disconnect == true ) {
 			echo esc_attr( 'checked="checked"' ); }
 		?>
-		 value="1">
+		value="1">
 		</fieldset></td>
-	  </tr>
+		</tr>
 	<tr>
 		<th scope="row"><?php esc_html_e( 'How many times a failed API call should get re-try', 'connect-discord-tutor-lms' ); ?></th>
 		<td> 
@@ -162,8 +170,8 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 		<input name="ets_tutor_lms_retry_api_count" type="number" min="1" id="ets_tutor_lms_retry_api_count" value="<?php echo esc_attr( $retry_api_count_value ); ?>">
 		</fieldset>
 	</td>
-	  </tr> 
-	  <tr>
+		</tr> 
+		<tr>
 		<th scope="row"><?php esc_html_e( 'Set job queue concurrency', 'connect-discord-tutor-lms' ); ?></th>
 		<td> 
 			<fieldset>
@@ -171,8 +179,8 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 		<input name="set_job_cnrc" type="number" min="1" id="set_job_cnrc" value="<?php echo esc_attr( $set_job_cnrc_value ); ?>">
 		</fieldset>
 	</td>
-	  </tr>
-	  <tr>
+		</tr>
+		<tr>
 		<th scope="row"><?php esc_html_e( 'Set job queue batch size', 'connect-discord-tutor-lms' ); ?></th>
 		<td> 
 			<fieldset>
@@ -180,7 +188,7 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 		<input name="set_job_q_batch_size" type="number" min="1" id="set_job_q_batch_size" value="<?php echo esc_attr( $set_job_q_batch_size_value ); ?>">
 		</fieldset>
 	</td>
-	  </tr>
+		</tr>
 	<tr>
 		<th scope="row"><?php esc_html_e( 'Log API calls response (For debugging purpose)', 'connect-discord-tutor-lms' ); ?></th>
 		<td> <fieldset>
@@ -189,15 +197,15 @@ $log_api_res             = sanitize_text_field( trim( get_option( 'ets_tutor_lms
 		if ( $log_api_res == true ) {
 			echo esc_attr( 'checked="checked"' ); }
 		?>
-		 value="1">
+		value="1">
 		</fieldset></td>
-	  </tr>
+		</tr>
 	
 	</tbody>
-  </table>
-  <div class="bottom-btn">
+	</table>
+	<div class="bottom-btn">
 	<button type="submit" name="adv_submit" value="ets_submit" class="ets-submit ets-bg-green">
-	  <?php esc_html_e( 'Save Settings', 'connect-discord-tutor-lms' ); ?>
+		<?php esc_html_e( 'Save Settings', 'connect-discord-tutor-lms' ); ?>
 	</button>
-  </div>
+	</div>
 </form>
