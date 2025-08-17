@@ -29,3 +29,14 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+
+if ( defined( 'WP_UNINSTALL_PLUGIN' )
+		&& $_REQUEST['plugin'] == 'connect-discord-tutor-lms/connect-discord-tutor-lms.php'
+		&& $_REQUEST['slug'] == 'Connect-tutorlms-to-discord'
+	&& wp_verify_nonce( $_REQUEST['_ajax_nonce'], 'updates' )
+  ) {
+
+	global $wpdb;
+	  $wpdb->query( 'DELETE FROM ' . $wpdb->prefix . "usermeta WHERE `meta_key` LIKE '_ets_tutor_lms_discord_%'" );
+	  $wpdb->query( 'DELETE FROM ' . $wpdb->prefix . "options WHERE `option_name` LIKE 'ets_tutor_lms_discord_%'" );
+}

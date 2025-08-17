@@ -13,10 +13,10 @@
  * @package           Connect_Discord_Tutor_Lms
  *
  * @wordpress-plugin
- * Plugin Name:       Connect Discord TutorLMS
+ * Plugin Name:       Connect TutorLMS to Discord
  * Plugin URI:        https://www.expresstechsoftwares.com/connect-discord-tutor-lms
  * Description:       The plugin seamlessly integrates with the Tutor LMS platform, allowing admins to easily link their courses to private Discord servers.
- * Version:           1.0.0
+ * Version:           1.1.1
  * Author:            ExpressTech Software Solutions Pvt. Ltd.
  * Author URI:        https://https://www.expresstechsoftwares.com
  * License:           GPL-2.0+
@@ -35,7 +35,27 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'CONNECT_DISCORD_TUTOR_LMS_VERSION', '1.0.0' );
+define( 'CONNECT_DISCORD_TUTOR_LMS_VERSION', '1.1.1' );
+define( 'CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_PATH', plugin_dir_path( __FILE__ ) );
+define( 'CONNECT_DISCORD_TUTOR_LMS_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
+define( 'CONNECT_DISCORD_TUTOR_LMS_API_URL', 'https://discord.com/api/v10/' );
+define( 'CONNECT_DISCORD_TUTOR_LMS_BOT_PERMISSIONS', 8 );
+define( 'CONNECT_DISCORD_TUTOR_LMS_OAUTH_SCOPES', 'identify email guilds guilds.join' );
+
+/**
+ * Define group name for action scheduler actions
+ */
+define( 'CONNECT_DISCORD_TUTOR_LMS_AS_GROUP_NAME', 'ets-tutor-lms-discord' );
+
+/**
+ * Follwing response codes not cosider for re-try API calls.
+ */
+define( 'CONNECT_DISCORD_TUTOR_LMS_DONOT_RETRY_THESE_API_CODES', array( 0, 10003, 50033, 10004, 50025, 10013, 10011 ) );
+
+/**
+ * Define plugin directory url
+ */
+define( 'CONNECT_DISCORD_TUTOR_LMS_DONOT_RETRY_HTTP_CODES', array( 400, 401, 403, 404, 405, 502 ) );
 
 /**
  * The code that runs during plugin activation.
