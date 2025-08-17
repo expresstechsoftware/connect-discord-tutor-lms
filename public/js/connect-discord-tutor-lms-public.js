@@ -2,7 +2,7 @@
 	'use strict';
 
 	/*Call-back on disconnect from discord and kick student if the case */
-	$('#tutor-lms-discord-disconnect-discord').on('click', function (e) {
+	$(document).on('click', '#tutor-lms-discord-disconnect-discord', function (e) {
             
 		e.preventDefault();
 		var userId = $(this).data('user-id');
