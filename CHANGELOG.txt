@@ -1,3 +1,6 @@
+= 1.1.1 =
+* Fix: Added event delegation in public.js to ensure the Discord disconnect button click works correctly when rendered dynamically (e.g., inside Gutenberg blocks).
+* Improvement: Enhanced compatibility to support multiple disconnect buttons on the same page.
 
 = 1.1.0 =
 * Added new `[tutor_lms_login_with_discord]` shortcode.
